@@ -17,7 +17,9 @@ namespace ma
     {
         m_MainLayout = new QHBoxLayout(this);
 
-        
+        m_ChatWidget = new ChatWidget(this);
+
+        m_MainLayout->addWidget(m_ChatWidget);
 
         this->setLayout(m_MainLayout);
 

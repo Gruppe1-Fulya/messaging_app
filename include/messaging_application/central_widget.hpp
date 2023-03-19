@@ -16,6 +16,8 @@
 #include <QObject>
 #include <QHBoxLayout>
 
+#include "chat_widget.hpp"
+
 namespace ma
 {
     class CentralWidget : public QWidget
@@ -29,6 +31,8 @@ namespace ma
         private:
 
         QHBoxLayout* m_MainLayout;
+
+        ChatWidget* m_ChatWidget;
 
 
     };

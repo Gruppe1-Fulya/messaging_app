@@ -9,13 +9,16 @@ set(CMAKE_AUTOUIC ON)
 
 # Find Qt5 libraries.
 find_package(Qt5 COMPONENTS Widgets Core REQUIRED)
+find_package(GTest REQUIRED)
 
 set(SOURCES 
     src/program.cpp
     src/main_window.cpp
     src/central_widget.cpp
+    src/chat_widget.cpp
     include/${PROJECT_NAME}/main_window.hpp
     include/${PROJECT_NAME}/central_widget.hpp
+    include/${PROJECT_NAME}/chat_widget.hpp
 )
 
 add_executable(
