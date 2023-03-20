@@ -10,19 +10,9 @@
  */
 
 #include "contacts_widget.hpp"
-
+#include <QDebug>
 namespace ma
 {
-
-    Contact::Contact(
-        const QString& email,
-        const QString& user_name
-    )
-        : QListWidgetItem(user_name), m_ContactName{user_name}, m_Email{email}
-    {  
-
-    }
-
     ContactsWidget::ContactsWidget(QWidget* parent)
         : QWidget(parent)
     {
@@ -88,14 +78,13 @@ namespace ma
 
         QString name = contact_id;
 
-        m_ContactsList->addItem(new Contact(contact_id, name));
+        m_ContactsList->addItem(new QListWidgetItem(contact_id));
 
     }
 
-    void ContactsWidget::openChatWindowReq()
+    void ContactsWidget::openChatWindowReq(QListWidgetItem* item)
     {
-        auto s = sender();
-        emit openChat(qobject_cast<Contact*>(s)->getContactName());
+        emit openChat(item->text());
     }
 
 }

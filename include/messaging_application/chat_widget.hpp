@@ -46,7 +46,7 @@ namespace ma
         ChatWidget(QWidget* parent = nullptr);
         ~ChatWidget();
 
-        int addChatTab(const std::string& chat_name);
+        int addChatTab(const QString& chat_name);
 
         private:
 
@@ -67,12 +67,12 @@ namespace ma
         public:
 
         ChatTab(
-            const std::string& chat_tab_name, 
+            const QString& chat_tab_name, 
             QWidget* parent = nullptr
         );
         ~ChatTab();
 
-        inline const std::string getTabName() const
+        inline const QString getTabName() const
         {
             return m_ChatTabName;
         }
@@ -99,7 +99,7 @@ namespace ma
         
         int currRow = 0;
 
-        std::string m_ChatTabName;
+        QString m_ChatTabName;
 
         void sendMessage();
         
@@ -111,7 +111,7 @@ namespace ma
         public:
 
         GroupChatTab(
-            const std::string& chat_tab_name, 
+            const QString& chat_tab_name, 
             QWidget* parent = nullptr
         );
         

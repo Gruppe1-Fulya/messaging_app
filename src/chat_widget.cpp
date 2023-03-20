@@ -19,7 +19,7 @@ namespace ma
         : QTabWidget(parent)
     {
 
-        //m_ChatTabs = std::unordered_map<std::string, ChatTab*>();
+        m_ChatTabs = std::unordered_map<std::string, ChatTab*>();
 
     }
 
@@ -30,19 +30,18 @@ namespace ma
             delete ct.second;
         }
     }
-    int ChatWidget::addChatTab(const std::string& chat_name)
+    int ChatWidget::addChatTab(const QString& chat_name)
     {   
         // Check if the ChatTab container has a tab with the given name.
         //if(m_ChatTabs.find(chat_name) == m_ChatTabs.end())
         //{
         //    return 0; // If a chat with that name already exists return -1;
         //}
-
         // Create a tab with the given name.
-        m_ChatTabs[chat_name] = new ChatTab(chat_name);
+        m_ChatTabs[chat_name.toStdString()] = new ChatTab(chat_name);
         
         // Add the new tab to the ChatWidget.
-        this->addTab(m_ChatTabs.at(chat_name), QString::fromStdString(chat_name));
+        this->addTab(m_ChatTabs.at(chat_name.toStdString()), chat_name);
         
         return 1;
     }
@@ -53,7 +52,7 @@ namespace ma
     -----------------------------------------
     */
 
-    ChatTab::ChatTab(const std::string& chat_tab_name, QWidget *parent)
+    ChatTab::ChatTab(const QString& chat_tab_name, QWidget *parent)
         : QWidget(parent), m_ChatTabName(chat_tab_name)
     {
         m_MainLayout = new QVBoxLayout(this);
@@ -129,7 +128,7 @@ namespace ma
 
     }
 
-    GroupChatTab::GroupChatTab(const std::string& chat_tab_name, QWidget* parent)
+    GroupChatTab::GroupChatTab(const QString& chat_tab_name, QWidget* parent)
         : ChatTab(chat_tab_name, parent)
     {
 

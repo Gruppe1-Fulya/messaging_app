@@ -20,39 +20,12 @@
 #include <QInputDialog>
 #include <QPushButton>
 #include <QDir>
+#include <QLabel>
 
 #include <functional>
 
 namespace ma
 {
-    class Contact : public QListWidgetItem
-    {
-        Q_OBJECT
-
-        public:
-
-        Contact(
-            const QString& email,
-            const QString& user_name
-        );
-
-        inline const QString getContactEmail() const
-        {
-            return m_Email;
-        }
-
-        inline const QString getContactName() const
-        {
-            return m_ContactName;
-        }
-
-        private:
-
-        QString m_ContactName;
-
-        QString m_Email;
-
-    };
 
     class ContactsWidget : public QWidget
     {
@@ -84,7 +57,7 @@ namespace ma
 
         void addContactToList(const QString& contact_id);
 
-        void openChatWindowReq();
+        void openChatWindowReq(QListWidgetItem* item);
 
     }; 
 }
