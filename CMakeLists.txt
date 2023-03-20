@@ -16,9 +16,11 @@ set(SOURCES
     src/main_window.cpp
     src/central_widget.cpp
     src/chat_widget.cpp
+    src/contacts_widget.cpp
     include/${PROJECT_NAME}/main_window.hpp
     include/${PROJECT_NAME}/central_widget.hpp
     include/${PROJECT_NAME}/chat_widget.hpp
+    include/${PROJECT_NAME}/contacts_widget.hpp
 )
 
 add_executable(

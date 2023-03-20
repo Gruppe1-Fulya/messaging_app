@@ -1,0 +1,101 @@
+/**
+ * @file contacts_widget.cpp
+ * @author Eren Naci Odabasi (enaciodabasi@outlook.com)
+ * @brief 
+ * @version 0.1
+ * @date 2023-03-19
+ * 
+ * @copyright Copyright (c) 2023
+ * 
+ */
+
+#include "contacts_widget.hpp"
+
+namespace ma
+{
+
+    Contact::Contact(
+        const QString& email,
+        const QString& user_name
+    )
+        : QListWidgetItem(user_name), m_ContactName{user_name}, m_Email{email}
+    {  
+
+    }
+
+    ContactsWidget::ContactsWidget(QWidget* parent)
+        : QWidget(parent)
+    {
+        
+        m_MainLayout = new QVBoxLayout();
+
+        m_AddContactBtn = new QPushButton();
+
+        m_MainLayout->addWidget(m_AddContactBtn, 10);
+
+        m_ContactsList = new QListWidget(this);
+        m_MainLayout->addWidget(m_ContactsList, 90);
+
+        connect(
+            m_AddContactBtn,
+            &QPushButton::clicked,
+            this,
+            &ContactsWidget::getContactInfo
+        );
+
+        connect(
+            this,
+            &ContactsWidget::createContact,
+            this,
+            &ContactsWidget::addContactToList
+        );
+
+        connect(
+            m_ContactsList,
+            &QListWidget::itemDoubleClicked,
+            this,
+            &ContactsWidget::openChatWindowReq
+        );
+
+
+        this->setLayout(m_MainLayout);
+
+    }
+
+    void ContactsWidget::getContactInfo()
+    {
+        bool ok;
+        QString email = QInputDialog::getText(
+            this,
+            tr("Add Contact"),
+            tr("E-Mail:"),
+            QLineEdit::Normal,
+            QDir::home().dirName(),
+            &ok
+        );
+
+        if(ok && !email.isEmpty())
+        {
+            emit createContact(email);
+        }
+
+
+    }
+
+    void ContactsWidget::addContactToList(const QString& contact_id)
+    {
+        // Get info from server regarding the email owner.
+
+        QString name = contact_id;
+
+        m_ContactsList->addItem(new Contact(contact_id, name));
+
+    }
+
+    void ContactsWidget::openChatWindowReq()
+    {
+        auto s = sender();
+        emit openChat(qobject_cast<Contact*>(s)->getContactName());
+    }
+
+}

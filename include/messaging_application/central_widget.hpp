@@ -17,6 +17,7 @@
 #include <QHBoxLayout>
 
 #include "chat_widget.hpp"
+#include "contacts_widget.hpp"
 
 namespace ma
 {
@@ -33,6 +34,7 @@ namespace ma
         QHBoxLayout* m_MainLayout;
 
         ChatWidget* m_ChatWidget;
+        ContactsWidget* m_ContactsWidget;
 
 
     };
