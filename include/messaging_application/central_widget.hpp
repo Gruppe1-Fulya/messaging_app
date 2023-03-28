@@ -18,6 +18,7 @@
 
 #include "chat_widget.hpp"
 #include "contacts_widget.hpp"
+#include "profile_widget.hpp"
 
 namespace ma
 {
@@ -29,13 +30,17 @@ namespace ma
 
         CentralWidget(QWidget* parent = nullptr);
 
+        void createUI();
+
         private:
 
         QHBoxLayout* m_MainLayout;
 
+        QVBoxLayout* m_ProfileAndContactsLayout;
+
         ChatWidget* m_ChatWidget;
         ContactsWidget* m_ContactsWidget;
-
+        ProfileWidget* m_ProfileWidget;
 
     };
 }

@@ -21,10 +21,9 @@ namespace ma
 
         m_AddContactBtn = new QPushButton();
 
-        m_MainLayout->addWidget(m_AddContactBtn, 10);
-
         m_ContactsList = new QListWidget(this);
         m_MainLayout->addWidget(m_ContactsList, 90);
+        m_MainLayout->addWidget(m_AddContactBtn, 10);
 
         connect(
             m_AddContactBtn,
