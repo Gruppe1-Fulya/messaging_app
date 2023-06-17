@@ -42,6 +42,10 @@ class Client : public QObject
     void onSendMessage(const MessageInfo& message_info);
     
     void newConnection();
+
+    void readyRead();
+
+    void disconnected();
 /* 
     void connected();
     void disconnected();
@@ -56,6 +60,7 @@ class Client : public QObject
     
     QTcpServer* m_ListenerServer;
 
+    QTcpSocket* m_Socket;
 };
 
 

@@ -32,12 +32,7 @@ namespace ma
     }
     int ChatWidget::addChatTab(const QString& chat_name)
     {   
-        // Check if the ChatTab container has a tab with the given name.
-        //if(m_ChatTabs.find(chat_name) == m_ChatTabs.end())
-        //{
-        //    return 0; // If a chat with that name already exists return -1;
-        //}
-        // Create a tab with the given name.
+
         ChatTab* newTab = new ChatTab(chat_name);
         m_ChatTabs[chat_name.toStdString()] = newTab;
         connect(
@@ -64,7 +59,7 @@ namespace ma
 
     void ChatWidget::onNewMessageArrived(const MessageInfo& message_info)
     {
-
+        m_ChatTabs.at(message_info.receiver.toStdString())->insertNewMessage(message_info);
     }
 
     /*
@@ -114,12 +109,12 @@ namespace ma
 
     }
 
-    void ChatTab::messageReceived(const QString& sender_name, const QString& message)
+    void ChatTab::insertNewMessage(const MessageInfo& message_info)
     {
         QLabel* newMsgBox = new QLabel();
         newMsgBox->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
         newMsgBox->setWordWrap(true);
-        newMsgBox->setText(message);
+        newMsgBox->setText(message_info.message);
         newMsgBox->setFrameStyle(QFrame::Box);
 
         m_MessageLayout->addWidget(newMsgBox, currRow, 0);

@@ -75,6 +75,13 @@ namespace ma
             &Client::onSendMessage
         );
 
+        connect(
+            m_Client,
+            &Client::newMessageArrived,
+            m_ChatWidget,
+            &ChatWidget::onNewMessageArrived
+        );
+
         
 
     }

@@ -29,7 +29,7 @@ Client::Client(QObject* parent)
 Client::~Client()
 {
     
-
+    m_ListenerServer->deleteLater();
     
 }
 
@@ -39,7 +39,7 @@ void Client::onSendMessage(const MessageInfo& message_info)
     QTcpSocket* socket = new QTcpSocket(this);
     socket->connectToHost(
         "localhost",
-        3000
+        3001
     );
     if(!socket->waitForConnected(5000))
         return;
@@ -52,11 +52,16 @@ void Client::onSendMessage(const MessageInfo& message_info)
 
     const auto jArr = QJsonArray{dataJObj, rJObj, sJObj};
 
-    const auto msgObj = QJsonObject{{"message", jArr}};
+    /* const auto msgObj = QJsonObject{{"message", jArr}}; */
+    const auto msgObj = QJsonObject{
+        {"data", message_info.message},
+        {"receiver", message_info.receiver},
+        {"sender", message_info.sender}
+    };
     const auto msgJDoc = QJsonDocument{msgObj};    
     
-    qDebug() << qPrintable(QString::fromUtf8(msgJDoc.toJson()));
-
+    /* qDebug() << qPrintable(QString::fromUtf8(msgJDoc.toJson()));
+ */
     socket->write(msgJDoc.toJson());
     //socket->write(msg, sizeof(msg));
     //socket->waitForBytesWritten();
@@ -64,37 +69,52 @@ void Client::onSendMessage(const MessageInfo& message_info)
     socket->close();
 }
 
-void Client::newConnection()
+void Client::readyRead()
 {
-    QTcpSocket* socket = m_ListenerServer->nextPendingConnection();
-    
     QJsonParseError parseError;
+    const auto incoming = m_Socket->readAll();
+    
     QJsonDocument jsonDoc = QJsonDocument::fromJson(
-        socket->readAll(),
+        incoming,
         &parseError
     );
-
+    
     if(parseError.error != QJsonParseError::NoError)
     {
+        qDebug() << parseError.errorString();
         return;
     }
 
-    QJsonArray jsonArr = jsonDoc.array();
+    /* QJsonArray jsonArr = jsonDoc.array();
 
     if(jsonArr.empty())
-    {
+    {   
+        qDebug() << "JSON array is empty";
         return;
-    }
-
-    const auto msgJson = jsonArr.first().toObject();
+    } */
     
-    const auto msg = msgJson.value("message").toString();
+    /* const auto msgJson = jsonArr.first().toObject(); */
+    const auto msgJson = jsonDoc.object();
+    
+    const auto msg = msgJson.value("data").toString();
     const auto sender = msgJson.value("sender").toString();
     const auto receiver = msgJson.value("receiver").toString();
-
+    
     MessageInfo mi = {msg, sender, receiver};
 
     emit newMessageArrived(mi);
+}
+void Client::disconnected()
+{
+    m_Socket->deleteLater();
+}
 
+void Client::newConnection()
+{
+   
+    m_Socket = new QTcpSocket();
+    m_Socket = m_ListenerServer->nextPendingConnection();
+    connect(m_Socket, &QTcpSocket::readyRead, this, &Client::readyRead);
+    connect(m_Socket, &QTcpSocket::disconnected, this, &Client::disconnected);
 
 }

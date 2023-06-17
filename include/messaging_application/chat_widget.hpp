@@ -97,13 +97,14 @@ namespace ma
             return m_ChatTabName;
         }
 
-        virtual void messageReceived(const QString& sender_name, const QString& message);
+        void insertNewMessage(const MessageInfo& message_info);
 
         signals:
 
         void transferMessage(const QString& message, const QString& receiver);
 
         public slots:
+        
 
         private:
 
