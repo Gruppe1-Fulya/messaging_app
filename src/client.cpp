@@ -36,7 +36,6 @@ Client::~Client()
 void Client::onSendMessage(const MessageInfo& message_info)
 {
 
-
     QTcpSocket* socket = new QTcpSocket(this);
     socket->connectToHost(
         "localhost",
@@ -45,10 +44,22 @@ void Client::onSendMessage(const MessageInfo& message_info)
     if(!socket->waitForConnected(5000))
         return;
 
-    const char* msg = message_info.message.toStdString().c_str();
+    //const char* msg = message_info.message.toStdString().c_str();
 
-    socket->write(msg, sizeof(msg));
-    socket->waitForBytesWritten();
+    const auto dataJObj = QJsonObject{{"data", message_info.message}};
+    const auto rJObj = QJsonObject{{"receiver", message_info.receiver}};
+    const auto sJObj = QJsonObject{{"sender", message_info.sender}};
+
+    const auto jArr = QJsonArray{dataJObj, rJObj, sJObj};
+
+    const auto msgObj = QJsonObject{{"message", jArr}};
+    const auto msgJDoc = QJsonDocument{msgObj};    
+    
+    qDebug() << qPrintable(QString::fromUtf8(msgJDoc.toJson()));
+
+    socket->write(msgJDoc.toJson());
+    //socket->write(msg, sizeof(msg));
+    //socket->waitForBytesWritten();
 
     socket->close();
 }
@@ -68,27 +79,22 @@ void Client::newConnection()
         return;
     }
 
-    for(const QString& key : jsonDoc.object().keys())
+    QJsonArray jsonArr = jsonDoc.array();
+
+    if(jsonArr.empty())
     {
-        qDebug() << jsonDoc.object()[key];
+        return;
     }
+
+    const auto msgJson = jsonArr.first().toObject();
     
-}
+    const auto msg = msgJson.value("message").toString();
+    const auto sender = msgJson.value("sender").toString();
+    const auto receiver = msgJson.value("receiver").toString();
 
-bool Client::connect()
-{
-    m_Socket = new QTcpSocket(this);
+    MessageInfo mi = {msg, sender, receiver};
 
-    m_Socket->connectToHost(
-        m_HostName,
-        m_PortNum
-    );
+    emit newMessageArrived(mi);
 
-    if(!m_Socket->waitForConnected(5000))
-    {   
 
-        return false;
-    }
-
-    return true;
 }

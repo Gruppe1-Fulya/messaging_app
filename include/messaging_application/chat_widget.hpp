@@ -63,6 +63,9 @@ namespace ma
 
         void onMessageTransfered(const QString& message, const QString& receiver);
 
+        void onNewMessageArrived(const MessageInfo& message_info);
+
+
         private:
 
         QString m_ChatOwnerID;
@@ -99,6 +102,8 @@ namespace ma
         signals:
 
         void transferMessage(const QString& message, const QString& receiver);
+
+        public slots:
 
         private:
 

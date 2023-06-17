@@ -16,6 +16,7 @@
 #include <QTcpServer>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonArray>
 #include <QObject>
 #include <QString>
 #include <QDebug>
@@ -32,9 +33,9 @@ class Client : public QObject
 
     ~Client();
 
-    bool connect();
-
     signals:
+
+    void newMessageArrived(const MessageInfo& message_info);
 
     public slots:
 
@@ -54,8 +55,6 @@ class Client : public QObject
     uint16_t m_PortNum;
     
     QTcpServer* m_ListenerServer;
-
-    QTcpSocket* m_Socket;
 
 };
 

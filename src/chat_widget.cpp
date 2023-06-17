@@ -57,9 +57,14 @@ namespace ma
     {
         MessageInfo mi;
         mi.message = message;
-        mi.receiver = message;
+        mi.receiver = receiver;
         mi.sender = m_ChatOwnerID;
         emit sendMessage(mi);
+    }
+
+    void ChatWidget::onNewMessageArrived(const MessageInfo& message_info)
+    {
+
     }
 
     /*
@@ -145,6 +150,8 @@ namespace ma
     {
 
     }
+
+
 
     GroupChatTab::GroupChatTab(const QString& chat_tab_name, QWidget* parent)
         : ChatTab(chat_tab_name, parent)
