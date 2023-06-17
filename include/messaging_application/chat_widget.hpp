@@ -31,6 +31,8 @@
 #include <iostream>
 #include <vector>
 
+#include "messaging_application/definitions.hpp"
+
 namespace ma
 {
 
@@ -48,7 +50,22 @@ namespace ma
 
         int addChatTab(const QString& chat_name);
 
+        void setChatOwnerID(const QString& chat_owner_id)
+        {
+            m_ChatOwnerID = chat_owner_id;
+        }
+
+        signals:
+
+        void sendMessage(const MessageInfo& message_info);
+
+        public slots:
+
+        void onMessageTransfered(const QString& message, const QString& receiver);
+
         private:
+
+        QString m_ChatOwnerID;
 
         std::unordered_map<std::string, ChatTab*> m_ChatTabs;        
 
@@ -78,6 +95,10 @@ namespace ma
         }
 
         virtual void messageReceived(const QString& sender_name, const QString& message);
+
+        signals:
+
+        void transferMessage(const QString& message, const QString& receiver);
 
         private:
 

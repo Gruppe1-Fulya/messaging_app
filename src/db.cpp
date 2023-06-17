@@ -64,7 +64,7 @@ QVector<QString> DatabaseHelper::getContacts()
     {
         while(query.next())
         {   
-            QString currName = query.value("name").toString().toUtf8().constData();
+            QString currName = query.value("email").toString().toUtf8().constData();
             c.push_back(currName);
         }
     }

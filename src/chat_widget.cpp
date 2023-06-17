@@ -38,12 +38,28 @@ namespace ma
         //    return 0; // If a chat with that name already exists return -1;
         //}
         // Create a tab with the given name.
-        m_ChatTabs[chat_name.toStdString()] = new ChatTab(chat_name);
-        
+        ChatTab* newTab = new ChatTab(chat_name);
+        m_ChatTabs[chat_name.toStdString()] = newTab;
+        connect(
+            newTab,
+            &ChatTab::transferMessage,
+            this,
+            &ChatWidget::onMessageTransfered
+        );
+
         // Add the new tab to the ChatWidget.
         this->addTab(m_ChatTabs.at(chat_name.toStdString()), chat_name);
         
         return 1;
+    }
+
+    void ChatWidget::onMessageTransfered(const QString& message, const QString& receiver)
+    {
+        MessageInfo mi;
+        mi.message = message;
+        mi.receiver = message;
+        mi.sender = m_ChatOwnerID;
+        emit sendMessage(mi);
     }
 
     /*
@@ -121,6 +137,8 @@ namespace ma
         m_TypeMsgBox->clear();
 
         currRow += 1;
+
+        emit transferMessage(msgToSend, m_ChatTabName);
     }
 
     ChatTab::~ChatTab()

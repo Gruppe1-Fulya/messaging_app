@@ -47,7 +47,7 @@ namespace ma
 
         DatabaseHelper* m_DatabaseHelper;
 
-        Client* client;
+        Client* m_Client;
 
     };
 }

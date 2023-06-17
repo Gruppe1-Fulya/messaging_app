@@ -12,10 +12,12 @@
 
 #include <QApplication>
 
+#include "messaging_application/definitions.hpp"
 #include "messaging_application/main_window.hpp"
 
 int main(int argc, char** argv)
 {
+    qRegisterMetaType<MessageInfo>();
     QApplication app(argc, argv);
 
     ma::MainWindow* mw = new ma::MainWindow();

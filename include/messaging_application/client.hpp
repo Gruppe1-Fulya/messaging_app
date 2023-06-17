@@ -20,6 +20,8 @@
 #include <QString>
 #include <QDebug>
 
+#include "messaging_application/definitions.hpp"
+
 class Client : public QObject
 {
     Q_OBJECT
@@ -35,6 +37,8 @@ class Client : public QObject
     signals:
 
     public slots:
+
+    void onSendMessage(const MessageInfo& message_info);
     
     void newConnection();
 /* 

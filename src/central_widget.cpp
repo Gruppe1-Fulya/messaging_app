@@ -47,10 +47,12 @@ namespace ma
 
         }
 
-        client = new Client(this);
+        m_Client = new Client(this);
         m_ChatWidget = new ChatWidget();
         m_ProfileWidget = new ProfileWidget({"Eren Naci Odabasi", "enaciodabasi@outlook.com"});
 
+        m_ChatWidget->setChatOwnerID(m_ProfileWidget->getUserID());
+        
         m_ProfileAndContactsLayout->addWidget(m_ProfileWidget, 20);
         m_ProfileAndContactsLayout->addWidget(m_ContactsWidget, 80);
         //m_MainLayout->addWidget(m_ContactsWidget, 35);
@@ -65,6 +67,15 @@ namespace ma
             m_ChatWidget,
             &ChatWidget::addChatTab  
         );
+
+        connect(
+            m_ChatWidget,
+            &ChatWidget::sendMessage,
+            m_Client,
+            &Client::onSendMessage
+        );
+
+        
 
     }
 

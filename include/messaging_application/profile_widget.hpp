@@ -38,10 +38,16 @@ namespace ma
 
         ProfileWidget(const UserInfo& user_info, QWidget* parent = nullptr);
 
+        const QString getUserID() const
+        {
+            return m_UserInfo.email;
+        }
+
         //~ProfileWidget();
 
         private:
 
+        UserInfo m_UserInfo;
         QHBoxLayout* m_MainLayout;
 
         QVBoxLayout* m_TextDisplayLayout;

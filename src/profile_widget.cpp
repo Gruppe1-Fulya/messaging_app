@@ -15,7 +15,7 @@ namespace ma
 {
 
     ProfileWidget::ProfileWidget(const UserInfo& user_info, QWidget* parent)
-        : QWidget(parent)
+        : QWidget(parent), m_UserInfo(user_info)
     {
         m_MainLayout = new QHBoxLayout();
 

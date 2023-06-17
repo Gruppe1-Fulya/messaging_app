@@ -17,8 +17,9 @@ Client::Client(QObject* parent)
     m_ListenerServer = new QTcpServer(this);
 
     QObject::connect(m_ListenerServer, &QTcpServer::newConnection, this, &Client::newConnection);
+    QHostAddress hostAddr("localhost");
 
-    if(!m_ListenerServer->listen(QHostAddress::Any, 1234))
+    if(!m_ListenerServer->listen(hostAddr, 3001))
     {
         qDebug() << "Can not start server";
     }
@@ -30,6 +31,26 @@ Client::~Client()
     
 
     
+}
+
+void Client::onSendMessage(const MessageInfo& message_info)
+{
+
+
+    QTcpSocket* socket = new QTcpSocket(this);
+    socket->connectToHost(
+        "localhost",
+        3000
+    );
+    if(!socket->waitForConnected(5000))
+        return;
+
+    const char* msg = message_info.message.toStdString().c_str();
+
+    socket->write(msg, sizeof(msg));
+    socket->waitForBytesWritten();
+
+    socket->close();
 }
 
 void Client::newConnection()
