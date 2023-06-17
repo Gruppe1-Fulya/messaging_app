@@ -17,11 +17,21 @@ pub fn insert_new_user_to_db(id : String, address : String) -> std::result::Resu
 
     let mut conn = pool.get_conn()?;
 
-    conn.exec_drop(
-        r"INSERT INTO registered_users (email, address) VALUES (:email, :address)",
-        params! {"email" => &id, "address" => &address}
+    let is_user_in_db : std::option::Option<String> = conn.exec_first(
+        "SELECT address FROM registered_users WHERE email=:id", 
+        params! {
+            "id" => &id,
+        },
     )?;
 
+
+    if(is_user_in_db.is_none())
+    {
+        conn.exec_drop(
+            r"INSERT INTO registered_users (email, address) VALUES (:email, :address)",
+            params! {"email" => &id, "address" => &address}
+        )?;
+    }
 
     Ok(())
 }
