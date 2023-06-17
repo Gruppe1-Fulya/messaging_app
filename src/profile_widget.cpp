@@ -9,7 +9,7 @@
  * 
  */
 
-#include "profile_widget.hpp"
+#include "messaging_application/profile_widget.hpp"
 
 namespace ma
 {
