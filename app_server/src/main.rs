@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 use tokio::{net::TcpListener, io::{ AsyncWriteExt, BufReader, AsyncBufReadExt}};
 
 
@@ -29,3 +30,14 @@ async fn main() {
     }
 }
 
+=======
+pub mod server;
+use crate::server::chat_server::{ group_chat, p2p_chat };
+
+#[tokio::main] // for Future execution in main function
+async fn main() {
+    
+    group_chat().await;
+    
+}
+>>>>>>> a6c24ec378441f97a8c9bfa8baf3bc91b66b58b8
