@@ -9,17 +9,43 @@
  * 
  */
 #include "central_widget.hpp"
+#include <QDebug>
 
 namespace ma
 {
 
     CentralWidget::CentralWidget(QWidget *parent)
     {
+
+        m_DatabaseHelper = new DatabaseHelper(
+            "QMYSQL",
+            "localhost",
+            "msgapp_db",
+            "admin",
+            "123456"
+        );
+        
+
+        if(m_DatabaseHelper->connectToDB())
+            qDebug() << "Connected to the database";
+        
+
         m_MainLayout = new QHBoxLayout(this);
 
         m_ProfileAndContactsLayout = new QVBoxLayout();
 
         m_ContactsWidget = new ContactsWidget();
+        if(m_DatabaseHelper->isConnectionOk())
+        {
+            QVector<QString> contactsFromDB;
+
+            contactsFromDB = m_DatabaseHelper->getContacts();
+            if(contactsFromDB.size() != 0)
+                m_ContactsWidget->loadContacts(contactsFromDB);  
+            else
+                qDebug() << "No contacts found";
+
+        }
         m_ChatWidget = new ChatWidget();
         m_ProfileWidget = new ProfileWidget({"Eren Naci Odabasi", "enaciodabasi@outlook.com"});
 
@@ -38,6 +64,11 @@ namespace ma
             &ChatWidget::addChatTab  
         );
 
+    }
+
+    CentralWidget::~CentralWidget()
+    {
+        delete m_DatabaseHelper;
     }
 
     void CentralWidget::createUI()

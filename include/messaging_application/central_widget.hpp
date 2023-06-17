@@ -19,6 +19,7 @@
 #include "chat_widget.hpp"
 #include "contacts_widget.hpp"
 #include "profile_widget.hpp"
+#include "db.hpp"
 
 namespace ma
 {
@@ -29,6 +30,7 @@ namespace ma
         public:
 
         CentralWidget(QWidget* parent = nullptr);
+        ~CentralWidget();
 
         void createUI();
 
@@ -41,6 +43,8 @@ namespace ma
         ChatWidget* m_ChatWidget;
         ContactsWidget* m_ContactsWidget;
         ProfileWidget* m_ProfileWidget;
+
+        DatabaseHelper* m_DatabaseHelper;
 
     };
 }

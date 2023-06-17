@@ -22,6 +22,9 @@
 #include <QDir>
 #include <QLabel>
 
+#include <QVector>
+#include <QString>
+
 #include <functional>
 
 namespace ma
@@ -35,8 +38,6 @@ namespace ma
 
         ContactsWidget(QWidget* parent = nullptr);
 
-        void loadContacts();
-
         signals:
 
         void createContact(const QString& contact_id_to_emit);
@@ -44,6 +45,8 @@ namespace ma
         void openChat(const QString& contact_id);
 
         public slots:
+
+        void loadContacts(const QVector<QString>& contacts);
 
         private:
 

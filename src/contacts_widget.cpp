@@ -86,4 +86,14 @@ namespace ma
         emit openChat(item->text());
     }
 
+    void ContactsWidget::loadContacts(const QVector<QString>& contacts)
+    {
+        for(const auto& c : contacts)
+        {
+            m_ContactsList->addItem(
+                new QListWidgetItem(c)
+            );
+        }
+    }
+
 }

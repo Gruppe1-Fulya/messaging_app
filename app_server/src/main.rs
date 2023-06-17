@@ -1,27 +1,31 @@
-use std::net::{TcpListener, TcpStream};
-use std::io::{prelude::*, BufReader};
+use tokio::{net::TcpListener, io::{ AsyncWriteExt, BufReader, AsyncBufReadExt}};
 
 
-fn main() {
+#[tokio::main]
+async fn main() {
     
-    let req_listener = TcpListener::bind("127.0.0.1:7878").unwrap();
+    let listener = TcpListener::bind("localhost:8080").await.unwrap();
 
-    for stream in req_listener.incoming()
-    {
-        let stream = stream.unwrap();
+    loop {
+    
+        let (mut socket, _addr) = listener.accept().await.unwrap();
+        tokio::spawn(async move{
+            let (reader, mut writer) = socket.split();
 
-        handle_connection(stream);
+            let mut reader = BufReader::new(reader);
+            let mut line = String::new();
+            loop {
+            
+                let bytes_read = reader.read_line(&mut line).await.unwrap();
+                if bytes_read == 0{
+                    break;
+                }
+            
+                writer.write_all(line.as_bytes()).await.unwrap();
+                line.clear();
+            }
+        });
+        
     }
 }
 
-fn handle_connection(mut stream: TcpStream)
-{
-    let buf_reader = BufReader::new(&mut stream);
-    let http_request: Vec<_> = buf_reader
-        .lines()
-        .map(|result| result.unwrap())
-        .take_while(|line| !line.is_empty())
-        .collect();
-
-    println!("Request: {:#?}", http_request);
-}
