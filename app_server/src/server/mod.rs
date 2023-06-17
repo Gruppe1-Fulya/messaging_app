@@ -1,2 +1,2 @@
-pub use self::chat_server::{group_chat, p2p_chat};
+pub use self::chat_server::{broadcast_server};
 pub mod chat_server;
