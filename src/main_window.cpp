@@ -1,4 +1,4 @@
-#include "main_window.hpp"
+#include "messaging_application/main_window.hpp"
 
 namespace ma
 {

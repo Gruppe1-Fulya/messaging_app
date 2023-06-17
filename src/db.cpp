@@ -9,7 +9,7 @@
  * 
  */
 
-#include "db.hpp"
+#include "messaging_application/db.hpp"
 
 DatabaseHelper::DatabaseHelper(
     const QString& database_type,

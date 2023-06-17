@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2023
  * 
  */
-#include "central_widget.hpp"
+#include "messaging_application/central_widget.hpp"
 #include <QDebug>
 
 namespace ma
@@ -46,6 +46,8 @@ namespace ma
                 qDebug() << "No contacts found";
 
         }
+
+        client = new Client(this);
         m_ChatWidget = new ChatWidget();
         m_ProfileWidget = new ProfileWidget({"Eren Naci Odabasi", "enaciodabasi@outlook.com"});
 

@@ -9,7 +9,7 @@
  * 
  */
 
-#include "contacts_widget.hpp"
+#include "messaging_application/contacts_widget.hpp"
 #include <QDebug>
 namespace ma
 {

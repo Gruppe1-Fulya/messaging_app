@@ -20,6 +20,7 @@
 #include "contacts_widget.hpp"
 #include "profile_widget.hpp"
 #include "db.hpp"
+#include "client.hpp"
 
 namespace ma
 {
@@ -45,6 +46,8 @@ namespace ma
         ProfileWidget* m_ProfileWidget;
 
         DatabaseHelper* m_DatabaseHelper;
+
+        Client* client;
 
     };
 }

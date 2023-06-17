@@ -9,7 +9,7 @@
  * 
  */
 
-#include "chat_widget.hpp"
+#include "messaging_application/chat_widget.hpp"
 
 #include <QDebug>
 

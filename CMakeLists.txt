@@ -8,7 +8,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 # Find Qt5 libraries.
-find_package(Qt5 COMPONENTS Widgets Core Sql REQUIRED)
+find_package(Qt5 COMPONENTS Widgets Core Sql Network REQUIRED)
 find_package(GTest REQUIRED)
 
 set(SOURCES 
@@ -19,17 +19,19 @@ set(SOURCES
     src/contacts_widget.cpp
     src/profile_widget.cpp
     src/db.cpp
+    src/client.cpp
     include/${PROJECT_NAME}/main_window.hpp
     include/${PROJECT_NAME}/central_widget.hpp
     include/${PROJECT_NAME}/chat_widget.hpp
     include/${PROJECT_NAME}/contacts_widget.hpp
     include/${PROJECT_NAME}/profile_widget.hpp
     include/${PROJECT_NAME}/db.hpp
+    include/${PROJECT_NAME}/client.hpp
     )
 
 add_executable(
     ${PROJECT_NAME}
     ${SOURCES}
 )
-target_link_libraries(${PROJECT_NAME} Qt5::Core Qt5::Widgets Qt5::Sql)
-target_include_directories(${PROJECT_NAME} PUBLIC include/${PROJECT_NAME})
+target_link_libraries(${PROJECT_NAME} Qt5::Core Qt5::Widgets Qt5::Sql Qt5::Network)
+target_include_directories(${PROJECT_NAME} PUBLIC include/)
