@@ -3,9 +3,16 @@ use tokio::{
     net::TcpListener,
     sync::broadcast, 
 };
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize, Clone)]
+struct MessageRequest {
+    message: String,
+    addr: std::net::SocketAddr,
+}
 
 
-pub async fn group_chat() {
+pub async fn broadcast_server() {
 
     // TCP Server listener
     let listener = TcpListener::bind("localhost:3000").await.unwrap();
@@ -21,8 +28,9 @@ pub async fn group_chat() {
         tokio::spawn(async move {
             let (reader, mut writer) = socket.split();
             let mut reader = BufReader::new(reader);
-            let mut line = String::new();
-    
+            
+            let mut line = String::new();            
+
             loop {
                 tokio::select! {
                     result = reader.read_line(&mut line) => {
@@ -30,7 +38,15 @@ pub async fn group_chat() {
                             break;
                         }
 
-                        tx.send((line.clone(), addr)).unwrap();
+                        let line_json = MessageRequest {
+                            message: line.clone(),
+                            addr: addr,
+                        };
+
+                        let mut json_string = serde_json::to_string(&line_json).unwrap();
+
+                        tx.send((json_string.clone(), addr)).unwrap();
+                        json_string.clear();
                         line.clear();
                     }
                     result = rx.recv() => {
@@ -44,8 +60,4 @@ pub async fn group_chat() {
             }
         });
     }
-}
-
-pub async fn p2p_chat() {
-    // p2p chat will be added
 }
