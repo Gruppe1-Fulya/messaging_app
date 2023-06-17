@@ -7,6 +7,7 @@ use tokio::{
     sync::broadcast, 
 };
 use serde::{Deserialize, Serialize};
+use crate::database::database;
 
 #[derive(Serialize, Deserialize, Clone)]
 struct MessageRequest {
