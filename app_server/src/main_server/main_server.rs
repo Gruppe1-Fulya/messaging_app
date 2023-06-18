@@ -79,7 +79,7 @@ pub async fn init_main_server()
                 
                 let insert_res = insert_new_user_to_db(&senderStr, &addressStr);
 
-                address = get_port_number_from_id(senderStr).unwrap();
+                address = get_port_number_from_id(receiverStr).unwrap();
                 if address.is_empty()
                 {
                     println!("Address is empty");

@@ -52,7 +52,7 @@ Client::Client(const QString& sender_id, const QString& address, const QString& 
 
 }
 
-Client::Client(const AppConfig& app_config, const QString sender_id, QObject* parent)
+Client::Client(const TcpConfig& app_config, const QString sender_id, QObject* parent)
     : QObject(parent), m_AppConfig(app_config), m_SenderID(sender_id)
 {
 

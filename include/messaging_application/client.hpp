@@ -33,7 +33,7 @@ class Client : public QObject
 
     Client(const QString& sender_id, const QString& address = "hostname", const QString& port = "3001", QObject* parent = nullptr);
     
-    Client(const AppConfig& app_config, const QString sender_id, QObject* parent = nullptr);
+    Client(const TcpConfig& app_config, const QString sender_id, QObject* parent = nullptr);
     
     ~Client();
 
@@ -63,7 +63,7 @@ class Client : public QObject
 
     private:
 
-    AppConfig m_AppConfig;
+    TcpConfig m_AppConfig;
 
     QString m_HostName = "localhost";
     
