@@ -9,6 +9,20 @@ struct UserInfo
     address: String,
 }
 
+pub fn clear_user_table() -> std::result::Result<(), Box<dyn std::error::Error>>
+{
+    let url  = "mysql://admin:123456@localhost:3306/mainserver_db";
+    let pool = Pool::new(url)?;
+
+    let mut conn = pool.get_conn()?;
+
+    let delete_table = conn.exec_drop(
+        "DELETE FROM registered_users",
+        ());
+
+    Ok(())
+}
+
 pub fn insert_new_user_to_db(id : String, address : String) -> std::result::Result<(), Box<dyn std::error::Error>>
 {
 
@@ -24,7 +38,7 @@ pub fn insert_new_user_to_db(id : String, address : String) -> std::result::Resu
         },
     )?;
 
-
+    
     if(is_user_in_db.is_none())
     {
         conn.exec_drop(
@@ -36,7 +50,7 @@ pub fn insert_new_user_to_db(id : String, address : String) -> std::result::Resu
     Ok(())
 }
 
-pub fn get_port_number_from_id(email : String) -> std::result::Result<(), Box<dyn std::error::Error>>
+pub fn get_port_number_from_id(email : String) -> std::result::Result<String, Box<dyn std::error::Error>>
 {
 
     let url  = "mysql://admin:123456@localhost:3306/mainserver_db";
@@ -51,7 +65,7 @@ pub fn get_port_number_from_id(email : String) -> std::result::Result<(), Box<dy
         },
     )?;
 
-    let address : String;
+    let mut address : String = String::new();
     if(res.is_some())
     {
         address = res.unwrap();
@@ -61,6 +75,7 @@ pub fn get_port_number_from_id(email : String) -> std::result::Result<(), Box<dy
         println!("No address found");
     }
 
+    Ok(address)
 
-    Ok(())
+    
 }

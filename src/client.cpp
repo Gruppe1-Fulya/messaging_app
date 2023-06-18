@@ -39,7 +39,7 @@ void Client::onSendMessage(const MessageInfo& message_info)
     QTcpSocket* socket = new QTcpSocket(this);
     socket->connectToHost(
         "localhost",
-        3001
+        3000
     );
     if(!socket->waitForConnected(5000))
         return;
@@ -65,7 +65,7 @@ void Client::onSendMessage(const MessageInfo& message_info)
     socket->write(msgJDoc.toJson());
     //socket->write(msg, sizeof(msg));
     //socket->waitForBytesWritten();
-
+    
     socket->close();
 }
 
