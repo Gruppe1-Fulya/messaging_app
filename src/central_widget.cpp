@@ -47,12 +47,13 @@ namespace ma
 
         }
 
-        m_Client = new Client(this);
+        
         m_ChatWidget = new ChatWidget();
         m_ProfileWidget = new ProfileWidget({"Eren Naci Odabasi", "enaciodabasi@outlook.com"});
 
+        m_Client = new Client(m_ProfileWidget->getUserID(), "localhost", "3001", this);
         m_ChatWidget->setChatOwnerID(m_ProfileWidget->getUserID());
-        
+
         m_ProfileAndContactsLayout->addWidget(m_ProfileWidget, 20);
         m_ProfileAndContactsLayout->addWidget(m_ContactsWidget, 80);
         //m_MainLayout->addWidget(m_ContactsWidget, 35);

@@ -19,6 +19,7 @@ int main(int argc, char** argv)
 {
     qRegisterMetaType<MessageInfo>();
     QApplication app(argc, argv);
+    QApplication::setApplicationName("Messaging Application");
 
     ma::MainWindow* mw = new ma::MainWindow();
     mw->show();

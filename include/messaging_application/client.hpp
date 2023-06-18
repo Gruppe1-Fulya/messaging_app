@@ -29,10 +29,15 @@ class Client : public QObject
 
     public:
 
-    explicit Client(QObject* parent = nullptr);
+    explicit Client(const QString& sender_id, const QString& address = "hostname", const QString& port = "3001", QObject* parent = nullptr);
 
     ~Client();
 
+    void setSenderID(const QString& sender_id)
+    {
+        m_SenderID = sender_id;
+    }
+    
     signals:
 
     void newMessageArrived(const MessageInfo& message_info);
@@ -54,9 +59,11 @@ class Client : public QObject
 
     private:
 
-    QString m_HostName;
+    QString m_HostName = "localhost";
     
-    uint16_t m_PortNum;
+    QString m_PortNum = "3001";
+
+    QString m_SenderID;
     
     QTcpServer* m_ListenerServer;
 

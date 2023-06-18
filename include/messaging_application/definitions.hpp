@@ -20,6 +20,7 @@ struct MessageInfo
     QString message;
     QString sender;
     QString receiver;
+
 }; Q_DECLARE_METATYPE(MessageInfo)
 
 #endif // DEFINITIONS_HPP_

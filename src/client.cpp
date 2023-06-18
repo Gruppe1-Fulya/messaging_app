@@ -11,9 +11,12 @@
 
 #include "messaging_application/client.hpp"
 
-Client::Client(QObject* parent)
-    : QObject(parent)
+Client::Client(const QString& sender_id, const QString& address, const QString& port, QObject* parent)
+    : QObject(parent), m_HostName(address), m_SenderID(sender_id)
 {
+
+    m_PortNum = port;
+
     m_ListenerServer = new QTcpServer(this);
 
     QObject::connect(m_ListenerServer, &QTcpServer::newConnection, this, &Client::newConnection);
@@ -22,6 +25,29 @@ Client::Client(QObject* parent)
     if(!m_ListenerServer->listen(hostAddr, 3001))
     {
         qDebug() << "Can not start server";
+    }
+    {
+        QTcpSocket* initialConnSocket = new QTcpSocket();
+        initialConnSocket->connectToHost(
+            "localhost",
+            3000
+        );
+        if(!initialConnSocket->waitForConnected(5000))
+            return;
+        const QString addr = m_HostName + ":" + m_PortNum;
+        const auto msgObj = QJsonObject{
+            {"data", ""},
+            {"receiver", ""},
+            {"sender", m_SenderID},
+            {"addr", addr}
+        };
+        const auto msgJDoc = QJsonDocument{msgObj};    
+    
+        initialConnSocket->write(msgJDoc.toJson());
+
+        initialConnSocket->waitForBytesWritten(3000);
+
+        initialConnSocket->close();
     }
 
 }
@@ -50,13 +76,17 @@ void Client::onSendMessage(const MessageInfo& message_info)
     const auto rJObj = QJsonObject{{"receiver", message_info.receiver}};
     const auto sJObj = QJsonObject{{"sender", message_info.sender}};
 
+    const QString addr = m_HostName + ":" + m_PortNum;
+    const auto adJObj = QJsonObject{{"addr", addr}};
+
     const auto jArr = QJsonArray{dataJObj, rJObj, sJObj};
 
     /* const auto msgObj = QJsonObject{{"message", jArr}}; */
     const auto msgObj = QJsonObject{
         {"data", message_info.message},
         {"receiver", message_info.receiver},
-        {"sender", message_info.sender}
+        {"sender", message_info.sender},
+        {"addr", addr}
     };
     const auto msgJDoc = QJsonDocument{msgObj};    
     
