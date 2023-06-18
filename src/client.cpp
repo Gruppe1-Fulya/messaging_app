@@ -52,6 +52,46 @@ Client::Client(const QString& sender_id, const QString& address, const QString& 
 
 }
 
+Client::Client(const AppConfig& app_config, const QString sender_id, QObject* parent)
+    : QObject(parent), m_AppConfig(app_config), m_SenderID(sender_id)
+{
+
+    const auto hostname = m_AppConfig.mainServerHostname;
+
+    m_ListenerServer = new QTcpServer(this);
+
+    QObject::connect(m_ListenerServer, &QTcpServer::newConnection, this, &Client::newConnection);
+    QHostAddress hostAddr(hostname);
+
+    if(!m_ListenerServer->listen(hostAddr, m_AppConfig.tcpServerPort))
+    {
+        qDebug() << "Can not start server";
+    }
+    {
+        QTcpSocket* initialConnSocket = new QTcpSocket();
+        initialConnSocket->connectToHost(
+            m_AppConfig.mainServerHostname,
+            m_AppConfig.mainServerPort
+        );
+        if(!initialConnSocket->waitForConnected(5000))
+            return;
+        const QString addr = m_AppConfig.tcpServerHostname + ":" + QString::number(m_AppConfig.tcpServerPort);
+        const auto msgObj = QJsonObject{
+            {"data", ""},
+            {"receiver", ""},
+            {"sender", m_SenderID},
+            {"addr", addr}
+        };
+        const auto msgJDoc = QJsonDocument{msgObj};    
+    
+        initialConnSocket->write(msgJDoc.toJson());
+
+        initialConnSocket->waitForBytesWritten(3000);
+
+        initialConnSocket->close();
+    }
+}
+
 Client::~Client()
 {
     
@@ -64,8 +104,8 @@ void Client::onSendMessage(const MessageInfo& message_info)
 
     QTcpSocket* socket = new QTcpSocket(this);
     socket->connectToHost(
-        "localhost",
-        3000
+        m_AppConfig.mainServerHostname,
+        m_AppConfig.mainServerPort
     );
     if(!socket->waitForConnected(5000))
         return;

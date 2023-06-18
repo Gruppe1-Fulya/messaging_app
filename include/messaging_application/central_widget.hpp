@@ -22,20 +22,31 @@
 #include "db.hpp"
 #include "client.hpp"
 
+#include <yaml-cpp/yaml.h>
+
 namespace ma
 {
+
+
     class CentralWidget : public QWidget
     {
         Q_OBJECT
 
         public:
 
-        CentralWidget(QWidget* parent = nullptr);
+        CentralWidget(const QString& config_file_path, QWidget* parent = nullptr);
         ~CentralWidget();
 
         void createUI();
 
+        void setConfigFilePath(const QString& config_file_path)
+        {
+            m_ConfigFilePath = config_file_path;
+        }
+
         private:
+
+        QString m_ConfigFilePath;
 
         QHBoxLayout* m_MainLayout;
 

@@ -10,6 +10,7 @@ set(CMAKE_AUTOUIC ON)
 # Find Qt5 libraries.
 find_package(Qt5 COMPONENTS Widgets Core Sql Network REQUIRED)
 find_package(GTest REQUIRED)
+find_package(yaml-cpp REQUIRED) 
 
 set(SOURCES 
     src/program.cpp
@@ -33,5 +34,5 @@ add_executable(
     ${PROJECT_NAME}
     ${SOURCES}
 )
-target_link_libraries(${PROJECT_NAME} Qt5::Core Qt5::Widgets Qt5::Sql Qt5::Network)
-target_include_directories(${PROJECT_NAME} PUBLIC include/)
+target_link_libraries(${PROJECT_NAME} Qt5::Core Qt5::Widgets Qt5::Sql Qt5::Network ${YAML_CPP_LIBRARIES})
+target_include_directories(${PROJECT_NAME} PUBLIC include/ ${YAML_CPP_INCLUDE_DIRS})

@@ -2,11 +2,10 @@
 
 namespace ma
 {
-    MainWindow::MainWindow(QWidget *parent)
+    MainWindow::MainWindow(const QString& config_file_path, QWidget *parent)
     {
-        m_CentralWidget = new CentralWidget(this);
+        m_CentralWidget = new CentralWidget(config_file_path, this);
         this->setCentralWidget(m_CentralWidget);
-
 
     }
 }

@@ -14,8 +14,27 @@
 namespace ma
 {
 
-    CentralWidget::CentralWidget(QWidget *parent)
+
+    CentralWidget::CentralWidget(const QString& config_file_path, QWidget *parent)
+        : QWidget(parent), m_ConfigFilePath(config_file_path)
     {
+
+        const AppConfig conf = [&config_file_path]()-> AppConfig
+        {
+            const auto confDoc = YAML::LoadFile(config_file_path.toStdString());
+
+            const auto tcpServerHostname = confDoc["tcp_server_hostname"].as<std::string>();
+            const auto tcpServerPort = confDoc["tcp_server_port"].as<uint16_t>();
+            const auto mainServerHostname = confDoc["main_server_hostname"].as<std::string>();
+            const auto mainServerPort = confDoc["main_server_port"].as<uint16_t>();
+
+            return {
+                QString::fromStdString(tcpServerHostname),
+                (quint16)tcpServerPort,
+                QString::fromStdString(mainServerHostname),
+                (quint16)mainServerPort
+            };
+        }();
 
         m_DatabaseHelper = new DatabaseHelper(
             "QMYSQL",
@@ -51,7 +70,8 @@ namespace ma
         m_ChatWidget = new ChatWidget();
         m_ProfileWidget = new ProfileWidget({"Eren Naci Odabasi", "enaciodabasi@outlook.com"});
 
-        m_Client = new Client(m_ProfileWidget->getUserID(), "localhost", "3001", this);
+        /* m_Client = new Client(m_ProfileWidget->getUserID(), "localhost", "3001", this); */
+        m_Client = new Client(conf, m_ProfileWidget->getUserID(), this);
         m_ChatWidget->setChatOwnerID(m_ProfileWidget->getUserID());
 
         m_ProfileAndContactsLayout->addWidget(m_ProfileWidget, 20);

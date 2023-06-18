@@ -33,7 +33,8 @@ namespace ma // ma is short for Messaging Application.
          * 
          * @param parent Pointer to the parent widget. 
          */
-        MainWindow(QWidget* parent = nullptr);
+        MainWindow(const QString& config_file_path, QWidget* parent = nullptr);
+
 
         private:
 

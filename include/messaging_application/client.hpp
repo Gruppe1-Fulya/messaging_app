@@ -21,6 +21,8 @@
 #include <QString>
 #include <QDebug>
 
+#include <iostream>
+
 #include "messaging_application/definitions.hpp"
 
 class Client : public QObject
@@ -29,15 +31,17 @@ class Client : public QObject
 
     public:
 
-    explicit Client(const QString& sender_id, const QString& address = "hostname", const QString& port = "3001", QObject* parent = nullptr);
-
+    Client(const QString& sender_id, const QString& address = "hostname", const QString& port = "3001", QObject* parent = nullptr);
+    
+    Client(const AppConfig& app_config, const QString sender_id, QObject* parent = nullptr);
+    
     ~Client();
 
     void setSenderID(const QString& sender_id)
     {
         m_SenderID = sender_id;
     }
-    
+
     signals:
 
     void newMessageArrived(const MessageInfo& message_info);
@@ -58,6 +62,8 @@ class Client : public QObject
     void readyRead(); */
 
     private:
+
+    AppConfig m_AppConfig;
 
     QString m_HostName = "localhost";
     

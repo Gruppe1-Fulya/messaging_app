@@ -19,7 +19,7 @@ namespace ma
         
         m_MainLayout = new QVBoxLayout();
 
-        m_AddContactBtn = new QPushButton();
+        m_AddContactBtn = new QPushButton("Add Contact");
 
         m_ContactsList = new QListWidget(this);
         m_MainLayout->addWidget(m_ContactsList, 90);
