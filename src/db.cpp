@@ -16,8 +16,10 @@ DatabaseHelper::DatabaseHelper(
     const QString& host_name,
     const QString& database_name,
     const QString& user_name,
-    const QString& password
-) : m_DatabaseType(database_type),
+    const QString& password,
+    QObject* parent
+) : QObject(parent),
+    m_DatabaseType(database_type),
     m_Hostname(host_name),
     m_DatabaseName(database_name),
     m_Username(user_name),
@@ -70,4 +72,26 @@ QVector<QString> DatabaseHelper::getContacts()
     }
 
     return c;
+}
+
+void DatabaseHelper::onAddNewContactToDB(const QString& contact_id)
+{
+    /* qDebug() << contact_id; */
+    QSqlQuery query;
+    
+    query.prepare("SELECT email FROM contacts WHERE email=:id");
+    query.bindValue(":id", contact_id);
+    query.exec();
+    if(query.size() > 0)
+    {
+        return;
+    }
+
+    query.clear();
+    query.prepare("INSERT INTO contacts (name, email) VALUES(:name,:email)");
+    query.bindValue(":name", contact_id);
+    query.bindValue(":email", contact_id);
+
+    query.exec();
+
 }

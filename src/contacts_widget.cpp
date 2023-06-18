@@ -73,11 +73,10 @@ namespace ma
 
     void ContactsWidget::addContactToList(const QString& contact_id)
     {
-        // Get info from server regarding the email owner.
-
-        QString name = contact_id;
-
+                
         m_ContactsList->addItem(new QListWidgetItem(contact_id));
+
+        emit addContactToDB(contact_id);
 
     }
 

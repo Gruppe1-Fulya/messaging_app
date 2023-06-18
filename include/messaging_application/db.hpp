@@ -20,8 +20,12 @@
 #include <QString>
 #include <QVariant>
 
-class DatabaseHelper
+#include <QDebug>
+
+class DatabaseHelper : public QObject
 {
+    Q_OBJECT
+
     public:
 
     DatabaseHelper(
@@ -29,7 +33,8 @@ class DatabaseHelper
         const QString& host_name,
         const QString& database_name,
         const QString& user_name,
-        const QString& password        
+        const QString& password,
+        QObject* parent = nullptr        
     );
     ~DatabaseHelper();
 
@@ -41,6 +46,10 @@ class DatabaseHelper
     {
         return m_IsConnectionOk;
     }
+
+    public slots:
+
+    void onAddNewContactToDB(const QString& contact_id);
 
     private:
 

@@ -42,6 +42,8 @@ namespace ma
 
         void createContact(const QString& contact_id_to_emit);
 
+        void addContactToDB(const QString& contact_id);
+
         void openChat(const QString& contact_id);
 
         public slots:
