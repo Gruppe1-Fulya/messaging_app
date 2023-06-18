@@ -1,4 +1,4 @@
-use std::{net::TcpStream, io::Write};
+use std::{net::TcpStream, io::Write, f32::consts::E};
 
 use tokio::{
     io::{AsyncBufReadExt, AsyncWriteExt, BufReader},
@@ -8,14 +8,15 @@ use tokio::{
 use serde::{Deserialize, Serialize};
 use serde_json;
 
-use crate::database::{self, database::get_port_number_from_id};
+use crate::database::{self, database::{get_port_number_from_id, insert_new_user_to_db}};
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 struct MessageInfo
 {
     data: String,
     sender: String,
-    receiver: String
+    receiver: String,
+    addr : String
 }
 
 
@@ -65,12 +66,21 @@ pub async fn init_main_server()
                 msg = msg_optional.unwrap();
                 let receiverStr = msg.clone().receiver;
                 
+                let addressStr : String = msg.clone().addr;
+                let senderStr : String = msg.clone().sender;
+                
+                let insert_res = insert_new_user_to_db(senderStr, addressStr);
+
                 address = get_port_number_from_id(receiverStr).unwrap();
                 if address.is_empty()
                 {
                     return;
                 }
-
+                
+                if(msg.clone().data.is_empty())
+                {
+                    return;
+                }
                 let forward_socket = std::net::TcpStream::connect(
                     address
                 );         
