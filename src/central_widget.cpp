@@ -19,7 +19,7 @@ namespace ma
         : QWidget(parent), m_ConfigFilePath(config_file_path)
     {
 
-        const AppConfig conf = [&config_file_path]()-> AppConfig
+        const TcpConfig conf = [&config_file_path]()-> TcpConfig
         {
             const auto confDoc = YAML::LoadFile(config_file_path.toStdString());
 
@@ -33,6 +33,19 @@ namespace ma
                 (quint16)tcpServerPort,
                 QString::fromStdString(mainServerHostname),
                 (quint16)mainServerPort
+            };
+        }();
+
+        const AppConfig appConf = [&config_file_path]() -> AppConfig
+        {
+            const auto confDoc = YAML::LoadFile(config_file_path.toStdString());
+
+            const auto username = confDoc["username"].as<std::string>();
+            const auto email = confDoc["email"].as<std::string>();
+
+            return {
+                QString::fromStdString(username),
+                QString::fromStdString(email)
             };
         }();
 
@@ -68,7 +81,7 @@ namespace ma
 
         
         m_ChatWidget = new ChatWidget();
-        m_ProfileWidget = new ProfileWidget({"Eren Naci Odabasi", "enaciodabasi@outlook.com"});
+        m_ProfileWidget = new ProfileWidget({appConf.username, appConf.email});
 
         /* m_Client = new Client(m_ProfileWidget->getUserID(), "localhost", "3001", this); */
         m_Client = new Client(conf, m_ProfileWidget->getUserID(), this);
@@ -103,7 +116,12 @@ namespace ma
             &ChatWidget::onNewMessageArrived
         );
 
-        
+        connect(
+            m_ContactsWidget,
+            &ContactsWidget::addContactToDB,
+            m_DatabaseHelper,
+            &DatabaseHelper::onAddNewContactToDB
+        );
 
     }
 

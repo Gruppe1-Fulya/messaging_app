@@ -1,7 +1,7 @@
-username: "Eren Naci Odabasi"
-email: "enaciodabasi@outlook.com"
+username: "Nihat Akin"
+email: "nihatakin@gmail.com"
 
 tcp_server_hostname: "localhost"
-tcp_server_port: 3001
+tcp_server_port: 3002
 main_server_hostname: "localhost"
 main_server_port: 3000

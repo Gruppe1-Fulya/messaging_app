@@ -59,7 +59,7 @@ namespace ma
 
     void ChatWidget::onNewMessageArrived(const MessageInfo& message_info)
     {
-        m_ChatTabs.at(message_info.receiver.toStdString())->insertNewMessage(message_info);
+        m_ChatTabs.at(message_info.sender.toStdString())->insertNewMessage(message_info);
     }
 
     /*

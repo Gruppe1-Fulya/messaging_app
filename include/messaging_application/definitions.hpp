@@ -23,12 +23,18 @@ struct MessageInfo
 
 }; Q_DECLARE_METATYPE(MessageInfo)
 
-struct AppConfig
+struct TcpConfig
 {
     QString tcpServerHostname;
     quint16 tcpServerPort;
     QString mainServerHostname;
     quint16 mainServerPort;
+};
+
+struct AppConfig
+{
+    QString username;
+    QString email;
 };
 
 #endif // DEFINITIONS_HPP_
