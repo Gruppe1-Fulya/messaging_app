@@ -23,7 +23,7 @@ pub fn clear_user_table() -> std::result::Result<(), Box<dyn std::error::Error>>
     Ok(())
 }
 
-pub fn insert_new_user_to_db(id : String, address : String) -> std::result::Result<(), Box<dyn std::error::Error>>
+pub fn insert_new_user_to_db(id : &String, address : &String) -> std::result::Result<(), Box<dyn std::error::Error>>
 {
 
     let url  = "mysql://admin:123456@localhost:3306/mainserver_db";
@@ -66,10 +66,11 @@ pub fn get_port_number_from_id(email : String) -> std::result::Result<String, Bo
     )?;
 
     let mut address : String = String::new();
+    /* println!("{:?}", res.unwrap().as_str()); */
     if(res.is_some())
     {
         address = res.unwrap();
-        println!("{:?}", address);
+        println!("Address from DB: {:?}", address);
     }
     else {
         println!("No address found");

@@ -46,39 +46,48 @@ pub async fn init_main_server()
 
             while let Ok(bytes_read) = reader.read_line(&mut line_read).await{
                 if bytes_read == 0
-                {
-                    return;
-                }            
+                {   
+                    println!("Bytes read = 0");
+                    break;
+                }         
                 if let Ok(message_info) = serde_json::from_str::<MessageInfo>(&line_read.as_str())
                 {   
-
                     let msg : MessageInfo = message_info.clone(); 
-                    
                     msg_optional = Some(msg);
-                }
+
+                }   
+                
 
             }
-            
-            let mut msg : MessageInfo;
-            let mut address : String = String::new();
-            if msg_optional.is_some()
-            {   
-                msg = msg_optional.unwrap();
-                let receiverStr = msg.clone().receiver;
-                
-                let addressStr : String = msg.clone().addr;
-                let senderStr : String = msg.clone().sender;
-                
-                let insert_res = insert_new_user_to_db(senderStr, addressStr);
 
-                address = get_port_number_from_id(receiverStr).unwrap();
+            let mut msg : MessageInfo = MessageInfo { data: String::new(), sender: String::new(), receiver: String::new(), addr: String::new()};
+            let mut address : String = String::new();
+
+            match msg_optional {
+                Some(ref t) => {msg = msg_optional.unwrap()},
+                None => {println!("empty")},
+            }
+            
+            if !msg.addr.is_empty()
+            {   
+                //msg = msg_optional.unwrap();
+                let receiverStr = msg.receiver.clone();
+                let addressStr : String = msg.addr.clone();
+                let senderStr : String = msg.sender.clone();
+
+                /* println!("{:?}", senderStr); */   
+                
+                let insert_res = insert_new_user_to_db(&senderStr, &addressStr);
+
+                address = get_port_number_from_id(senderStr).unwrap();
                 if address.is_empty()
                 {
+                    println!("Address is empty");
                     return;
                 }
                 
-                if(msg.clone().data.is_empty())
-                {
+                if msg.data.is_empty()
+                {   
                     return;
                 }
                 let forward_socket = std::net::TcpStream::connect(
@@ -95,12 +104,11 @@ pub async fn init_main_server()
                     }
                 }
             
+            }
 
             line_read.clear();
             
             msg_optional = None;
-            
-            }
         });
     }
 }
