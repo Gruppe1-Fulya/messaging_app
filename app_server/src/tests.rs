@@ -29,7 +29,7 @@ pub mod tests {
     #[tokio::test] 
     async fn test_init_main_server() {
 
-        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let listener = TcpListener::bind("localhost:3000").unwrap();
 
         let initial_active_connections = listener.local_addr().unwrap().port();
 
