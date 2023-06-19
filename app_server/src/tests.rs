@@ -26,5 +26,24 @@ pub mod tests {
     
     
     // ------ Tests for Main Server ------ \\
-    // To be added.
+    #[tokio::test] 
+    async fn test_init_main_server() {
+
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+
+        let initial_active_connections = listener.local_addr().unwrap().port();
+
+        let init_server_process = tokio::spawn(async move {
+            init_main_server().await;
+        });
+
+        let client_socket = TcpStream::connect(listener.local_addr().unwrap()).unwrap();
+
+        tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+
+        let final_active_connections = listener.local_addr().unwrap().port();
+
+        init_server_process.abort();
+        assert_eq!(initial_active_connections, final_active_connections, "Test - Main server connection");
+    }
 }
