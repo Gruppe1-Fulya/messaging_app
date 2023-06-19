@@ -20,6 +20,8 @@
 int main(int argc, char** argv)
 {
     qRegisterMetaType<MessageInfo>();
+    qRegisterMetaType<ChatHistory>();
+    
     QApplication app(argc, argv);
     QApplication::setApplicationName("Messaging Application");
 

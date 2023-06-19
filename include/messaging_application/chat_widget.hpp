@@ -55,9 +55,13 @@ namespace ma
             m_ChatOwnerID = chat_owner_id;
         }
 
+        void loadChatHistories(const QVector<ChatHistory>& histories);
+
         signals:
 
         void sendMessage(const MessageInfo& message_info);
+
+        void saveMessage(const MessageInfo& message_info);
 
         public slots:
 
@@ -99,11 +103,14 @@ namespace ma
 
         void insertNewMessage(const MessageInfo& message_info);
 
+        void loadChatHistory(const ChatHistory& chat_history);
+        
         signals:
 
         void transferMessage(const QString& message, const QString& receiver);
 
         public slots:
+        
         
 
         private:

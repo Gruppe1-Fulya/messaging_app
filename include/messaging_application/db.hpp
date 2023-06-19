@@ -19,8 +19,11 @@
 #include <QVector>
 #include <QString>
 #include <QVariant>
-
 #include <QDebug>
+
+#include <optional>
+
+#include "messaging_application/definitions.hpp"
 
 class DatabaseHelper : public QObject
 {
@@ -42,12 +45,21 @@ class DatabaseHelper : public QObject
 
     QVector<QString> getContacts();
 
+    std::optional<ChatHistory> getChatHistory(
+        const QString& user,
+        const QString& from
+    );
+
+    void createTableForUser(const QString& id);
+
     inline bool isConnectionOk()
     {
         return m_IsConnectionOk;
     }
 
     public slots:
+
+    void onSaveChatToDB(const MessageInfo& message_info);
 
     void onAddNewContactToDB(const QString& contact_id);
 
@@ -61,9 +73,10 @@ class DatabaseHelper : public QObject
     QString m_Username;
     QString m_Password;
 
+    QString m_UserContactsTableName;
+    QString m_UserChatHistoryTableName;
+
     bool m_IsConnectionOk = false;
-
-
 
 };
 

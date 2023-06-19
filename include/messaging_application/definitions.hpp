@@ -13,6 +13,8 @@
 #define DEFINITIONS_HPP_
 
 #include <QObject>
+#include <QVector>
+#include <QPair>
 #include <QString>
 
 struct MessageInfo
@@ -36,5 +38,13 @@ struct AppConfig
     QString username;
     QString email;
 };
+
+struct ChatHistory
+{
+
+    QVector<QPair<QString, QString>> messages;
+/*     QVector<QString> userMsgs;
+    QVector<QString> otherMsgs; */
+}; Q_DECLARE_METATYPE(ChatHistory)
 
 #endif // DEFINITIONS_HPP_

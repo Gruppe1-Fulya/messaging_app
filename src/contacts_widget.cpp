@@ -92,6 +92,8 @@ namespace ma
             m_ContactsList->addItem(
                 new QListWidgetItem(c)
             );
+
+            emit openChat(c);
         }
     }
 

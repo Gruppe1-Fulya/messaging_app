@@ -65,8 +65,30 @@ namespace ma
         m_MainLayout = new QHBoxLayout(this);
 
         m_ProfileAndContactsLayout = new QVBoxLayout();
-
+        m_ChatWidget = new ChatWidget();
+        m_ChatWidget->setChatOwnerID(appConf.email);
         m_ContactsWidget = new ContactsWidget();
+        connect(
+            m_ContactsWidget,
+            &ContactsWidget::openChat,
+            m_ChatWidget,
+            &ChatWidget::addChatTab  
+        );
+
+        connect(
+            m_ChatWidget,
+            &ChatWidget::saveMessage,
+            m_DatabaseHelper,
+            &DatabaseHelper::onSaveChatToDB
+        );
+
+        // If the user tables for contact information and chat history does not exist
+        // Create a table for both.
+        if(m_DatabaseHelper->isConnectionOk())
+        {
+            m_DatabaseHelper->createTableForUser(appConf.email);
+        }
+
         if(m_DatabaseHelper->isConnectionOk())
         {
             QVector<QString> contactsFromDB;
@@ -77,15 +99,25 @@ namespace ma
             else
                 qDebug() << "No contacts found";
 
+
+            QVector<ChatHistory> hists;
+            for(const auto& c : contactsFromDB)
+            {
+                const auto histOpt = m_DatabaseHelper->getChatHistory(appConf.email, c);
+                if(histOpt != std::nullopt)
+                {   
+                    hists.push_back(histOpt.value());
+                }
+            }
+
+            m_ChatWidget->loadChatHistories(hists);
+
         }
-
         
-        m_ChatWidget = new ChatWidget();
         m_ProfileWidget = new ProfileWidget({appConf.username, appConf.email});
-
+        
         /* m_Client = new Client(m_ProfileWidget->getUserID(), "localhost", "3001", this); */
         m_Client = new Client(conf, m_ProfileWidget->getUserID(), this);
-        m_ChatWidget->setChatOwnerID(m_ProfileWidget->getUserID());
 
         m_ProfileAndContactsLayout->addWidget(m_ProfileWidget, 20);
         m_ProfileAndContactsLayout->addWidget(m_ContactsWidget, 80);
@@ -94,13 +126,6 @@ namespace ma
         m_MainLayout->addWidget(m_ChatWidget, 65);
         
         this->setLayout(m_MainLayout);
-
-        connect(
-            m_ContactsWidget,
-            &ContactsWidget::openChat,
-            m_ChatWidget,
-            &ChatWidget::addChatTab  
-        );
 
         connect(
             m_ChatWidget,

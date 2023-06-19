@@ -33,6 +33,10 @@ namespace ma
     int ChatWidget::addChatTab(const QString& chat_name)
     {   
 
+        if(m_ChatTabs.find(chat_name.toStdString()) != m_ChatTabs.end())
+        {
+            return -1;
+        }
         ChatTab* newTab = new ChatTab(chat_name);
         m_ChatTabs[chat_name.toStdString()] = newTab;
         connect(
@@ -41,7 +45,7 @@ namespace ma
             this,
             &ChatWidget::onMessageTransfered
         );
-
+        
         // Add the new tab to the ChatWidget.
         this->addTab(m_ChatTabs.at(chat_name.toStdString()), chat_name);
         
@@ -55,11 +59,53 @@ namespace ma
         mi.receiver = receiver;
         mi.sender = m_ChatOwnerID;
         emit sendMessage(mi);
+        emit saveMessage(mi);
     }
 
     void ChatWidget::onNewMessageArrived(const MessageInfo& message_info)
     {
         m_ChatTabs.at(message_info.sender.toStdString())->insertNewMessage(message_info);
+        emit saveMessage(message_info);
+    }
+
+    void ChatWidget::loadChatHistories(const QVector<ChatHistory>& histories)
+    {
+        const QString username = m_ChatOwnerID;
+        
+        for(const auto& hist : histories)
+        {
+            QString targetChatName  = [&hist, &username]() -> QString {
+                QString target;
+                bool flag = true;
+
+                int c = 0;
+                while(flag && c < hist.messages.size())
+                {
+                    /* qDebug() << "First" << hist.messages.at(c).first << "Second: " << hist.messages.at(c).second; */
+                    if(hist.messages.at(c).first == username)
+                    {   
+                        c+=1;
+                        continue;
+                    }
+                    else{
+                        target = hist.messages.at(c).first;
+                        break;
+                    }
+                    
+                    c += 1;
+                }
+
+                /* for(const auto m : hist.messages)
+                    qDebug() << m.first; */
+
+                return target;
+            }();
+
+            m_ChatTabs.at(targetChatName.toStdString())->loadChatHistory(
+                hist
+            );
+        }
+        
     }
 
     /*
@@ -144,6 +190,37 @@ namespace ma
     ChatTab::~ChatTab()
     {
 
+    }
+
+    void ChatTab::loadChatHistory(const ChatHistory& chat_history)
+    {
+        const QString receiverName = m_ChatTabName;
+        for(std::size_t i = 0; i < chat_history.messages.size(); i++)
+        {   
+            /* qDebug() << chat_history.messages.at(i).first;  */
+            const int col = [&chat_history, &receiverName, &i]() -> int {
+
+                   
+                if(chat_history.messages.at(i).first == receiverName)
+                {
+                    return 1;
+                }
+
+                return 0;
+
+            }();
+
+            QLabel* newMsgBox = new QLabel();
+            newMsgBox->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
+            newMsgBox->setText(chat_history.messages.at(i).second);
+            newMsgBox->setWordWrap(true);
+            newMsgBox->setFrameStyle(QFrame::Box);
+
+            m_MessageLayout->addWidget(newMsgBox, currRow, col);
+
+            currRow += 1;
+
+        }
     }
 
 
