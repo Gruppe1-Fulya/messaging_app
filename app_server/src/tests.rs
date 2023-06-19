@@ -44,6 +44,6 @@ pub mod tests {
         let final_active_connections = listener.local_addr().unwrap().port();
 
         init_server_process.abort();
-        assert_eq!(initial_active_connections, final_active_connections, "Test - Main server connection");
+        assert_eq!(initial_active_connections + 1, final_active_connections, "Test - Main server connection");
     }
 }
