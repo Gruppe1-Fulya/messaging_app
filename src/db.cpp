@@ -1,6 +1,6 @@
 /**
  * @file db.cpp
- * @author your name (you@domain.com)
+ * @author Eren Naci Odabasi (enaciodabasi@outlook.com)
  * @brief 
  * @version 0.1
  * @date 2023-06-02

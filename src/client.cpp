@@ -1,6 +1,6 @@
 /**
  * @file client.cpp
- * @author your name (you@domain.com)
+ * @author Eren Naci Odabasi (enaciodabasi@outlook.com)
  * @brief 
  * @version 0.1
  * @date 2023-06-17
@@ -130,7 +130,8 @@ void Client::onSendMessage(const MessageInfo& message_info)
         {"addr", addr},
         {"group", ""}
     };
-    const auto msgJDoc = QJsonDocument{msgObj};     
+    const auto msgJDoc = QJsonDocument{msgObj};    
+ 
     socket->write(msgJDoc.toJson());
     
     socket->close();
