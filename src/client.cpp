@@ -113,7 +113,6 @@ void Client::onSendMessage(const MessageInfo& message_info)
     if(!socket->waitForConnected(5000))
         return;
 
-    //const char* msg = message_info.message.toStdString().c_str();
 
     const auto dataJObj = QJsonObject{{"data", message_info.message}};
     const auto rJObj = QJsonObject{{"receiver", message_info.receiver}};
@@ -124,7 +123,6 @@ void Client::onSendMessage(const MessageInfo& message_info)
 
     const auto jArr = QJsonArray{dataJObj, rJObj, sJObj};
 
-    /* const auto msgObj = QJsonObject{{"message", jArr}}; */
     const auto msgObj = QJsonObject{
         {"data", message_info.message},
         {"receiver", message_info.receiver},
@@ -132,13 +130,8 @@ void Client::onSendMessage(const MessageInfo& message_info)
         {"addr", addr},
         {"group", ""}
     };
-    const auto msgJDoc = QJsonDocument{msgObj};    
-    
-    /* qDebug() << qPrintable(QString::fromUtf8(msgJDoc.toJson()));
- */
+    const auto msgJDoc = QJsonDocument{msgObj};     
     socket->write(msgJDoc.toJson());
-    //socket->write(msg, sizeof(msg));
-    //socket->waitForBytesWritten();
     
     socket->close();
 }

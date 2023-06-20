@@ -77,7 +77,6 @@ QVector<QString> DatabaseHelper::getContacts()
 QVector<GroupInfo> DatabaseHelper::getGroupChats()
 {    
 
-    // Get registered groups from ID_groups table.
     QSqlQuery q;
     
     q.prepare("SELECT group_name FROM " + m_UserID + "_groups");
@@ -153,7 +152,6 @@ void DatabaseHelper::onAddMemberToDB(const QString& group_name, const QString& u
 
 void DatabaseHelper::onAddNewContactToDB(const QString& contact_id)
 {
-    /* qDebug() << contact_id; */
     QSqlQuery query;
     
     query.prepare("SELECT email FROM " + m_UserContactsTableName + " WHERE email=:id");
