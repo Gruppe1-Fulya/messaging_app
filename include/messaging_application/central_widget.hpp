@@ -21,6 +21,7 @@
 #include "profile_widget.hpp"
 #include "db.hpp"
 #include "client.hpp"
+#include "group_chat_widget.hpp"
 
 #include <yaml-cpp/yaml.h>
 
@@ -54,6 +55,7 @@ namespace ma
 
         ChatWidget* m_ChatWidget;
         ContactsWidget* m_ContactsWidget;
+        GroupChatList* m_GroupChatList;
         ProfileWidget* m_ProfileWidget;
 
         DatabaseHelper* m_DatabaseHelper;

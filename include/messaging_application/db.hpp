@@ -45,6 +45,8 @@ class DatabaseHelper : public QObject
 
     QVector<QString> getContacts();
 
+    QVector<GroupInfo> getGroupChats();
+
     std::optional<ChatHistory> getChatHistory(
         const QString& user,
         const QString& from
@@ -63,6 +65,10 @@ class DatabaseHelper : public QObject
 
     void onAddNewContactToDB(const QString& contact_id);
 
+    void onAddGroupToDB(const GroupInfo& group_info);
+
+    void onAddMemberToDB(const QString& group_name, const QString& userID);
+
     private:
 
     QSqlDatabase* m_Database;
@@ -73,6 +79,7 @@ class DatabaseHelper : public QObject
     QString m_Username;
     QString m_Password;
 
+    QString m_UserID;
     QString m_UserContactsTableName;
     QString m_UserChatHistoryTableName;
 

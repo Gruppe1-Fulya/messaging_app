@@ -67,7 +67,11 @@ namespace ma
         m_ProfileAndContactsLayout = new QVBoxLayout();
         m_ChatWidget = new ChatWidget();
         m_ChatWidget->setChatOwnerID(appConf.email);
+        QVBoxLayout* contactAndGroupLayout = new QVBoxLayout();
         m_ContactsWidget = new ContactsWidget();
+        m_GroupChatList = new GroupChatList(appConf.email);
+        contactAndGroupLayout->addWidget(m_ContactsWidget, 50);
+        contactAndGroupLayout->addWidget(m_GroupChatList, 50);
         connect(
             m_ContactsWidget,
             &ContactsWidget::openChat,
@@ -76,10 +80,31 @@ namespace ma
         );
 
         connect(
+            m_GroupChatList,
+            &GroupChatList::openGroupChat,
+            m_ChatWidget,
+            &ChatWidget::addGroupChatTab
+        );
+
+        connect(
             m_ChatWidget,
             &ChatWidget::saveMessage,
             m_DatabaseHelper,
             &DatabaseHelper::onSaveChatToDB
+        );
+
+        connect(
+            m_GroupChatList,
+            &GroupChatList::addGroupToDB,
+            m_DatabaseHelper,
+            &DatabaseHelper::onAddGroupToDB
+        );
+
+        connect(
+            m_ChatWidget,
+            &ChatWidget::addMemberToDB,
+            m_DatabaseHelper,
+            &DatabaseHelper::onAddMemberToDB
         );
 
         // If the user tables for contact information and chat history does not exist
@@ -112,6 +137,13 @@ namespace ma
 
             m_ChatWidget->loadChatHistories(hists);
 
+            const auto groupInfoFromDb = m_DatabaseHelper->getGroupChats();
+
+            if(!groupInfoFromDb.isEmpty())
+            {
+                m_GroupChatList->loadGroupChats(groupInfoFromDb);
+            }
+
         }
         
         m_ProfileWidget = new ProfileWidget({appConf.username, appConf.email});
@@ -120,7 +152,7 @@ namespace ma
         m_Client = new Client(conf, m_ProfileWidget->getUserID(), this);
 
         m_ProfileAndContactsLayout->addWidget(m_ProfileWidget, 20);
-        m_ProfileAndContactsLayout->addWidget(m_ContactsWidget, 80);
+        m_ProfileAndContactsLayout->addLayout(contactAndGroupLayout, 80);
         //m_MainLayout->addWidget(m_ContactsWidget, 35);
         m_MainLayout->addLayout(m_ProfileAndContactsLayout, 35);
         m_MainLayout->addWidget(m_ChatWidget, 65);

@@ -24,7 +24,7 @@
 #include <QString>
 #include <QLabel>
 #include <QTextEdit>
-
+#include <QPainter>
 
 #include <unordered_map>
 #include <string>
@@ -32,6 +32,7 @@
 #include <vector>
 
 #include "messaging_application/definitions.hpp"
+#include "messaging_application/group_chat_widget.hpp"
 
 namespace ma
 {
@@ -50,6 +51,8 @@ namespace ma
 
         int addChatTab(const QString& chat_name);
 
+        void addGroupChatTab(const GroupInfo& group_info);
+
         void setChatOwnerID(const QString& chat_owner_id)
         {
             m_ChatOwnerID = chat_owner_id;
@@ -63,18 +66,26 @@ namespace ma
 
         void saveMessage(const MessageInfo& message_info);
 
+        void addMemberToDB(const QString& group_name, const QString& userID);
+
         public slots:
 
         void onMessageTransfered(const QString& message, const QString& receiver);
 
         void onNewMessageArrived(const MessageInfo& message_info);
 
+        void onAddMemberToDB(
+            const QString& group_name,
+            const QString& userID
+        );
 
         private:
 
         QString m_ChatOwnerID;
 
-        std::unordered_map<std::string, ChatTab*> m_ChatTabs;        
+        std::unordered_map<std::string, ChatTab*> m_ChatTabs;   
+
+        std::unordered_map<std::string, GroupChatWidget*> m_GroupChatTabs;      
 
     };
 
@@ -92,6 +103,7 @@ namespace ma
 
         ChatTab(
             const QString& chat_tab_name, 
+            const QString& chat_owner_name,
             QWidget* parent = nullptr
         );
         ~ChatTab();
@@ -111,8 +123,7 @@ namespace ma
 
         public slots:
         
-        
-
+    
         private:
 
         QVBoxLayout* m_MainLayout;
@@ -135,24 +146,13 @@ namespace ma
 
         QString m_ChatTabName;
 
+        QString m_ChatOwnerName;
+
         void sendMessage();
         
 
     };
 
-    class GroupChatTab : public ChatTab
-    {
-        public:
-
-        GroupChatTab(
-            const QString& chat_tab_name, 
-            QWidget* parent = nullptr
-        );
-        
-        private:
-
-
-    };
 
 } // End of namespace ma
 

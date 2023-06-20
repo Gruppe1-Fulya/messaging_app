@@ -21,6 +21,7 @@ set(SOURCES
     src/profile_widget.cpp
     src/db.cpp
     src/client.cpp
+    src/group_chat_widget.cpp
     include/${PROJECT_NAME}/main_window.hpp
     include/${PROJECT_NAME}/central_widget.hpp
     include/${PROJECT_NAME}/chat_widget.hpp
@@ -28,6 +29,7 @@ set(SOURCES
     include/${PROJECT_NAME}/profile_widget.hpp
     include/${PROJECT_NAME}/db.hpp
     include/${PROJECT_NAME}/client.hpp
+    include/${PROJECT_NAME}/group_chat_widget.hpp
     )
 
 add_executable(

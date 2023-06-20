@@ -74,6 +74,83 @@ QVector<QString> DatabaseHelper::getContacts()
     return c;
 }
 
+QVector<GroupInfo> DatabaseHelper::getGroupChats()
+{    
+
+    // Get registered groups from ID_groups table.
+    QSqlQuery q;
+    
+    q.prepare("SELECT group_name FROM " + m_UserID + "_groups");
+    q.exec();
+
+    QVector<QString> groupNames;
+    if(q.size() > 0)
+    {
+        while(q.next())
+        {
+            const QString groupName = q.value("group_name").toString();
+            /* qDebug() << groupName; */
+            groupNames.push_back(groupName);
+        }
+    }
+
+    QVector<GroupInfo> groupInfos;
+
+    q.clear();
+
+    for(const auto& groupName : groupNames)
+    {
+        q.prepare("SELECT * FROM msgapp_db." + groupName + "_info");
+        q.exec();
+
+        if(q.size() > 0)
+        {
+            GroupInfo inf;
+            inf.groupName = groupName;
+
+            while(q.next())
+            {
+                inf.members.push_back(q.value("email").toString());
+            }
+
+            qDebug() << inf.groupName;
+            groupInfos.push_back(inf);
+            
+        }
+        else
+        {
+            /* qDebug() << "Can't find DB with the given group name"; */
+            continue;
+        }
+    }
+    
+    return groupInfos;
+
+}
+
+void DatabaseHelper::onAddMemberToDB(const QString& group_name, const QString& userID)
+{   
+    qDebug() << "Adding " << userID << " to " << group_name + "_info";
+    QSqlQuery q;
+
+    q.prepare("SELECT email FROM" + group_name + "_info WHERE email=:id");
+    q.bindValue(":id", userID);
+    q.exec();
+    if(q.size() > 0)
+    {   
+        qDebug() << "q size < 0";
+        return;
+    }
+
+    q.clear();
+
+    q.prepare("INSERT INTO " + group_name + "_info (group_name, email) VALUES(:group_name, :email)" );
+    q.bindValue(":group_name", group_name);
+    q.bindValue(":email", userID);
+    q.exec();
+
+}
+
 void DatabaseHelper::onAddNewContactToDB(const QString& contact_id)
 {
     /* qDebug() << contact_id; */
@@ -93,6 +170,44 @@ void DatabaseHelper::onAddNewContactToDB(const QString& contact_id)
     query.bindValue(":email", contact_id);
 
     query.exec();
+
+}
+
+void DatabaseHelper::onAddGroupToDB(const GroupInfo& group_info)
+{
+    QSqlQuery q;
+
+    QString statement = 
+    "CREATE TABLE if not exists msgapp_db." + 
+    group_info.groupName + 
+    "_info (id int auto_increment, group_name varchar(255), email varchar(255) not null, primary key(id, email));";
+    q.exec(statement);
+    q.clear();
+
+    if(!group_info.members.isEmpty())
+    {   
+        for(const QString& member : group_info.members)
+        {
+            q.prepare("INSERT INTO " + group_info.groupName + "(group_name, email) VALUES(:group_name, :email)");
+            q.bindValue(":group_name", group_info.groupName);
+            q.bindValue(":email", member);
+            q.exec();
+            q.clear();
+        }
+        
+    }
+
+    q.clear();
+
+    q.prepare(
+        "CREATE TABLE if not exists msgapp_db." + m_UserID + "_groups (group_name varchar(255) not null, primary key(group_name))"
+    );
+    q.exec();
+    q.clear();
+
+    q.prepare("INSERT INTO msgapp_db." + m_UserID + "_groups(group_name) VALUES(:group_name)");
+    q.bindValue(":group_name", group_info.groupName);
+    q.exec();
 
 }
 
@@ -158,6 +273,7 @@ std::optional<ChatHistory> DatabaseHelper::getChatHistory(
 void DatabaseHelper::createTableForUser(const QString& id)
 {
     const auto tableName = id.split("@").first();
+    m_UserID = tableName;
 
     QSqlQuery q;
 

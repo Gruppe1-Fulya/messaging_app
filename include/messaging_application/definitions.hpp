@@ -47,4 +47,10 @@ struct ChatHistory
     QVector<QString> otherMsgs; */
 }; Q_DECLARE_METATYPE(ChatHistory)
 
+struct GroupInfo
+{
+    QString groupName;
+    QVector<QString> members;
+}; Q_DECLARE_METATYPE(GroupInfo);
+
 #endif // DEFINITIONS_HPP_

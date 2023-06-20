@@ -20,7 +20,7 @@ namespace ma
     {
 
         m_ChatTabs = std::unordered_map<std::string, ChatTab*>();
-
+        m_GroupChatTabs = std::unordered_map<std::string, GroupChatWidget*>();
     }
 
     ChatWidget::~ChatWidget()
@@ -37,7 +37,7 @@ namespace ma
         {
             return -1;
         }
-        ChatTab* newTab = new ChatTab(chat_name);
+        ChatTab* newTab = new ChatTab(chat_name, m_ChatOwnerID);
         m_ChatTabs[chat_name.toStdString()] = newTab;
         connect(
             newTab,
@@ -50,6 +50,28 @@ namespace ma
         this->addTab(m_ChatTabs.at(chat_name.toStdString()), chat_name);
         
         return 1;
+    }
+
+    void ChatWidget::addGroupChatTab(const GroupInfo& group_info)
+    {
+        if(m_GroupChatTabs.find(group_info.groupName.toStdString()) != m_GroupChatTabs.end())
+        {
+            return;
+        }
+
+        GroupChatWidget* newGroupChatTab = new GroupChatWidget(group_info, m_ChatOwnerID);
+        connect(
+            newGroupChatTab,
+            &GroupChatWidget::addNewUserToGroupDB,
+            this,
+            &ChatWidget::onAddMemberToDB
+        );
+        newGroupChatTab->initialMember();
+        m_GroupChatTabs[group_info.groupName.toStdString()] = newGroupChatTab;
+
+
+        this->addTab(m_GroupChatTabs.at(group_info.groupName.toStdString()), group_info.groupName);
+
     }
 
     void ChatWidget::onMessageTransfered(const QString& message, const QString& receiver)
@@ -108,14 +130,22 @@ namespace ma
         
     }
 
+    void ChatWidget::onAddMemberToDB(
+        const QString& group_name,
+        const QString& userID)
+    {
+        qDebug() << "adding mmember to db cw";
+        emit addMemberToDB(group_name, userID);
+    }
+
     /*
     -----------------------------------------
     -----------------------------------------
     -----------------------------------------
     */
 
-    ChatTab::ChatTab(const QString& chat_tab_name, QWidget *parent)
-        : QWidget(parent), m_ChatTabName(chat_tab_name)
+    ChatTab::ChatTab(const QString& chat_tab_name, const QString& chat_owner_name, QWidget *parent)
+        : QWidget(parent), m_ChatTabName(chat_tab_name), m_ChatOwnerName(chat_owner_name)
     {
         m_MainLayout = new QVBoxLayout(this);
 
@@ -163,7 +193,20 @@ namespace ma
         newMsgBox->setText(message_info.message);
         newMsgBox->setFrameStyle(QFrame::Box);
 
-        m_MessageLayout->addWidget(newMsgBox, currRow, 0);
+        QLabel* userBox = new QLabel();
+        userBox->setText(m_ChatTabName);
+        userBox->setAlignment(Qt::AlignTop);
+        userBox->setFixedSize(255, 20);
+        
+        QVBoxLayout* msgLayout = new QVBoxLayout();
+        msgLayout->setStretch(0, 0);
+        msgLayout->setSpacing(0);
+        msgLayout->setContentsMargins(0, 0, 0, 0);
+        msgLayout->addWidget(userBox, 0);
+        msgLayout->addWidget(newMsgBox, 0);
+
+        m_MessageLayout->addLayout(msgLayout, currRow, 0);
+        m_MessageLayout->setSpacing(0);
 
         currRow += 1;
     }
@@ -178,7 +221,21 @@ namespace ma
         newMsgBox->setWordWrap(true);
         newMsgBox->setFrameStyle(QFrame::Box);
 
-        m_MessageLayout->addWidget(newMsgBox, currRow, 1);
+        QLabel* userBox = new QLabel();
+        userBox->setText(m_ChatOwnerName);
+        userBox->setAlignment(Qt::AlignTop);
+        userBox->setFixedSize(255, 20);
+        
+        QVBoxLayout* msgLayout = new QVBoxLayout();
+        msgLayout->setStretch(0, 0);
+        msgLayout->setSpacing(0);
+        msgLayout->setContentsMargins(0, 0, 0, 0);
+        msgLayout->addWidget(userBox, 0);
+        msgLayout->addWidget(newMsgBox, 0);
+            
+
+        m_MessageLayout->addLayout(msgLayout, currRow, 1);
+        m_MessageLayout->setSpacing(0);
     
         m_TypeMsgBox->clear();
 
@@ -203,31 +260,39 @@ namespace ma
                    
                 if(chat_history.messages.at(i).first == receiverName)
                 {
-                    return 1;
+                    return 0;
                 }
 
-                return 0;
+                return 1;
 
             }();
-
+        
             QLabel* newMsgBox = new QLabel();
             newMsgBox->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
             newMsgBox->setText(chat_history.messages.at(i).second);
             newMsgBox->setWordWrap(true);
             newMsgBox->setFrameStyle(QFrame::Box);
+            
+            QLabel* userBox = new QLabel();
+            userBox->setText(chat_history.messages.at(i).first);
+            userBox->setAlignment(Qt::AlignTop);
+            userBox->setFixedSize(255, 20);
+            
+            QVBoxLayout* msgLayout = new QVBoxLayout();
+            msgLayout->setStretch(0, 0);
+            msgLayout->setSpacing(0);
+            msgLayout->setContentsMargins(0, 0, 0, 0);
+            msgLayout->addWidget(userBox, 0);
+            msgLayout->addWidget(newMsgBox, 0);
+            
 
-            m_MessageLayout->addWidget(newMsgBox, currRow, col);
+            m_MessageLayout->addLayout(msgLayout, currRow, col);
+            m_MessageLayout->setSpacing(0);
+            
 
             currRow += 1;
 
         }
     }
 
-
-
-    GroupChatTab::GroupChatTab(const QString& chat_tab_name, QWidget* parent)
-        : ChatTab(chat_tab_name, parent)
-    {
-
-    }
 }
