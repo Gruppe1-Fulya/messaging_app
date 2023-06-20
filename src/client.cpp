@@ -35,11 +35,13 @@ Client::Client(const QString& sender_id, const QString& address, const QString& 
         if(!initialConnSocket->waitForConnected(5000))
             return;
         const QString addr = m_HostName + ":" + m_PortNum;
+        qDebug() << addr;
         const auto msgObj = QJsonObject{
             {"data", ""},
             {"receiver", ""},
             {"sender", m_SenderID},
-            {"addr", addr}
+            {"addr", addr},
+            {"group", ""}
         };
         const auto msgJDoc = QJsonDocument{msgObj};    
     
@@ -80,7 +82,8 @@ Client::Client(const TcpConfig& app_config, const QString sender_id, QObject* pa
             {"data", ""},
             {"receiver", ""},
             {"sender", m_SenderID},
-            {"addr", addr}
+            {"addr", addr},
+            {"group", ""}
         };
         const auto msgJDoc = QJsonDocument{msgObj};    
     
@@ -126,7 +129,8 @@ void Client::onSendMessage(const MessageInfo& message_info)
         {"data", message_info.message},
         {"receiver", message_info.receiver},
         {"sender", message_info.sender},
-        {"addr", addr}
+        {"addr", addr},
+        {"group", ""}
     };
     const auto msgJDoc = QJsonDocument{msgObj};    
     
@@ -169,6 +173,19 @@ void Client::readyRead()
     const auto msg = msgJson.value("data").toString();
     const auto sender = msgJson.value("sender").toString();
     const auto receiver = msgJson.value("receiver").toString();
+    const auto group = msgJson.value("group").toString();
+    if(!group.isEmpty())
+    {
+        GroupMessage gm;
+        gm.sender = sender;
+        gm.groupName = group;
+        gm.data = msg;
+        gm.members = receiver.split(";").toVector();
+
+        emit newGroupMessageArrived(gm);
+
+        return;
+    }
     
     MessageInfo mi = {msg, sender, receiver};
 
@@ -186,5 +203,45 @@ void Client::newConnection()
     m_Socket = m_ListenerServer->nextPendingConnection();
     connect(m_Socket, &QTcpSocket::readyRead, this, &Client::readyRead);
     connect(m_Socket, &QTcpSocket::disconnected, this, &Client::disconnected);
+
+}
+
+void Client::onSendGroupMessage(const GroupMessage& msg)
+{
+    QTcpSocket* socket = new QTcpSocket(this);
+    socket->connectToHost(
+        m_AppConfig.mainServerHostname,
+        m_AppConfig.mainServerPort
+    );
+
+    if(!socket->waitForConnected(5000))
+    {
+        return;
+    }
+
+    const QString addr = m_HostName + ":" + m_PortNum;
+    QString receiversString;
+
+    for(const auto& receiver : msg.members)
+    {
+        receiversString += receiver;
+        receiversString += ";";
+    }
+
+    /* QString senderStr = msg.groupName + ";" + msg.sender; */
+
+    qDebug() << receiversString;
+
+    const auto msgObj = QJsonObject{
+        {"data", msg.data},
+        {"receiver", receiversString},
+        {"sender", msg.sender},
+        {"addr", addr},
+        {"group", msg.groupName}
+    };
+    const auto msgJsonDoc = QJsonDocument{msgObj};
+
+    socket->write(msgJsonDoc.toJson());
+    socket->close();
 
 }

@@ -107,6 +107,13 @@ namespace ma
             &DatabaseHelper::onAddMemberToDB
         );
 
+        connect(
+            m_GroupChatList,
+            &GroupChatList::newGroupMessage,
+            m_ChatWidget,
+            &ChatWidget::onNewGroupMessageArrived
+        );
+
         // If the user tables for contact information and chat history does not exist
         // Create a table for both.
         if(m_DatabaseHelper->isConnectionOk())
@@ -128,11 +135,13 @@ namespace ma
             QVector<ChatHistory> hists;
             for(const auto& c : contactsFromDB)
             {
+                
                 const auto histOpt = m_DatabaseHelper->getChatHistory(appConf.email, c);
                 if(histOpt != std::nullopt)
                 {   
                     hists.push_back(histOpt.value());
                 }
+
             }
 
             m_ChatWidget->loadChatHistories(hists);
@@ -161,9 +170,23 @@ namespace ma
 
         connect(
             m_ChatWidget,
+            &ChatWidget::sendGroupMessage,
+            m_Client,
+            &Client::onSendGroupMessage
+        );
+
+        connect(
+            m_ChatWidget,
             &ChatWidget::sendMessage,
             m_Client,
             &Client::onSendMessage
+        );
+
+        connect(
+            m_Client,
+            &Client::newGroupMessageArrived,
+            m_GroupChatList,
+            &GroupChatList::onNewGroupMessageArrived
         );
 
         connect(

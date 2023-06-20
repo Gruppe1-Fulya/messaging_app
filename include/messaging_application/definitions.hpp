@@ -53,4 +53,12 @@ struct GroupInfo
     QVector<QString> members;
 }; Q_DECLARE_METATYPE(GroupInfo);
 
+struct GroupMessage
+{
+    QString data;
+    QString groupName;
+    QString sender;
+    QVector<QString> members;
+}; Q_DECLARE_METATYPE(GroupMessage);
+
 #endif // DEFINITIONS_HPP_

@@ -102,24 +102,23 @@ QVector<GroupInfo> DatabaseHelper::getGroupChats()
     {
         q.prepare("SELECT * FROM msgapp_db." + groupName + "_info");
         q.exec();
-
+        GroupInfo inf;
+        inf.groupName = groupName;
         if(q.size() > 0)
         {
-            GroupInfo inf;
-            inf.groupName = groupName;
 
             while(q.next())
             {
                 inf.members.push_back(q.value("email").toString());
             }
 
-            qDebug() << inf.groupName;
             groupInfos.push_back(inf);
             
         }
         else
         {
             /* qDebug() << "Can't find DB with the given group name"; */
+            groupInfos.push_back(inf);
             continue;
         }
     }
@@ -263,8 +262,29 @@ std::optional<ChatHistory> DatabaseHelper::getChatHistory(
                 q.value("message").toString()
             ));
         }
+        bool flag = false;
+        for(const auto msg : ch.messages)
+        {
+            if(msg.first == user)
+                continue;
+
+            else if(msg.first == from)
+            {
+                flag = true;
+                break;
+            }
+        }
+
+        if(!flag)
+        {
+            return std::nullopt;
+        }
 
         return ch;
+    }
+    else
+    {
+        return std::nullopt;
     }
 
     return std::nullopt;

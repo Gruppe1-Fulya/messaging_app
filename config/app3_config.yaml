@@ -1,0 +1,7 @@
+username: "Temp"
+email: "temp@outlook.com"
+
+tcp_server_hostname: "localhost"
+tcp_server_port: 3003
+main_server_hostname: "localhost"
+main_server_port: 3000

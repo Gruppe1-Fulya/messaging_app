@@ -64,6 +64,8 @@ namespace ma
 
         void sendMessage(const MessageInfo& message_info);
 
+        void sendGroupMessage(const GroupMessage& msg);
+
         void saveMessage(const MessageInfo& message_info);
 
         void addMemberToDB(const QString& group_name, const QString& userID);
@@ -72,7 +74,11 @@ namespace ma
 
         void onMessageTransfered(const QString& message, const QString& receiver);
 
+        void onGroupMessageTransfered(const GroupMessage& msg);
+
         void onNewMessageArrived(const MessageInfo& message_info);
+
+        void onNewGroupMessageArrived(const GroupMessage& msg);
 
         void onAddMemberToDB(
             const QString& group_name,
@@ -85,7 +91,9 @@ namespace ma
 
         std::unordered_map<std::string, ChatTab*> m_ChatTabs;   
 
-        std::unordered_map<std::string, GroupChatWidget*> m_GroupChatTabs;      
+        std::unordered_map<std::string, GroupChatWidget*> m_GroupChatTabs;
+
+        QVector<QString> m_Contacts;      
 
     };
 

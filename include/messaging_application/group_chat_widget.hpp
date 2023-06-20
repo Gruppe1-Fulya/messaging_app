@@ -26,6 +26,7 @@
 #include <QScrollArea>
 #include <QDir>
 #include <QDebug>
+#include <QLabel>
 
 #include "messaging_application/definitions.hpp"
 
@@ -50,6 +51,8 @@ namespace ma
 
         void openGroupChat(const GroupInfo& group_info);
 
+        void newGroupMessage(const GroupMessage& msg);
+
         public slots:
 
         void addGroupChatToList(const GroupInfo& group_info);
@@ -60,6 +63,7 @@ namespace ma
             const QVector<GroupInfo>& chats
         );
 
+        void onNewGroupMessageArrived(const GroupMessage& msg);
 
         private:
 
@@ -100,13 +104,29 @@ namespace ma
 
         ~GroupChatWidget(){}
 
+        void insertNewMessage(const GroupMessage& msg);
+
         signals:
 
         void addNewUserToGroupDB(const QString& group_name, const QString& userID);
 
+        void requestContacts();
+
+        void transferMessage(const GroupMessage& msg_info);
+
+        public slots:
+
+        void onAddMemberBtnClicked();
+
         private:
 
         QVBoxLayout* m_MainLayout;
+
+        QTextEdit* m_ContactNameBox;
+
+        QPushButton* m_AddContactBtn;
+
+        QHBoxLayout* m_ContactLayout;
 
         QGridLayout* m_MessageLayout;
 
@@ -131,6 +151,8 @@ namespace ma
         QVector<QString> m_GroupMembers;
 
         void addUserToChat(const QString& group_name, const QString& userID);
+
+        void sendMessage();
 
 
     };

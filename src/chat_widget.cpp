@@ -19,8 +19,8 @@ namespace ma
         : QTabWidget(parent)
     {
 
-        m_ChatTabs = std::unordered_map<std::string, ChatTab*>();
-        m_GroupChatTabs = std::unordered_map<std::string, GroupChatWidget*>();
+        //m_ChatTabs = std::unordered_map<std::string, ChatTab*>();
+        //m_GroupChatTabs = std::unordered_map<std::string, GroupChatWidget*>();
     }
 
     ChatWidget::~ChatWidget()
@@ -46,14 +46,17 @@ namespace ma
             &ChatWidget::onMessageTransfered
         );
         
-        // Add the new tab to the ChatWidget.
+        // Add the new tab to the ChatWidget
         this->addTab(m_ChatTabs.at(chat_name.toStdString()), chat_name);
+        
+        m_Contacts.push_back(chat_name);
         
         return 1;
     }
 
     void ChatWidget::addGroupChatTab(const GroupInfo& group_info)
     {
+        
         if(m_GroupChatTabs.find(group_info.groupName.toStdString()) != m_GroupChatTabs.end())
         {
             return;
@@ -66,9 +69,15 @@ namespace ma
             this,
             &ChatWidget::onAddMemberToDB
         );
+
         newGroupChatTab->initialMember();
         m_GroupChatTabs[group_info.groupName.toStdString()] = newGroupChatTab;
-
+        connect(
+            newGroupChatTab,
+            &GroupChatWidget::transferMessage,
+            this,
+            &ChatWidget::onGroupMessageTransfered
+        );
 
         this->addTab(m_GroupChatTabs.at(group_info.groupName.toStdString()), group_info.groupName);
 
@@ -84,10 +93,22 @@ namespace ma
         emit saveMessage(mi);
     }
 
+    void ChatWidget::onGroupMessageTransfered(const GroupMessage& msg)
+    {
+        emit sendGroupMessage(msg);
+    }
+
     void ChatWidget::onNewMessageArrived(const MessageInfo& message_info)
     {
         m_ChatTabs.at(message_info.sender.toStdString())->insertNewMessage(message_info);
         emit saveMessage(message_info);
+    }
+
+    void ChatWidget::onNewGroupMessageArrived(const GroupMessage& msg)
+    {
+        m_GroupChatTabs.at(msg.groupName.toStdString())->insertNewMessage(
+            msg
+        );
     }
 
     void ChatWidget::loadChatHistories(const QVector<ChatHistory>& histories)
@@ -96,6 +117,7 @@ namespace ma
         
         for(const auto& hist : histories)
         {
+            
             QString targetChatName  = [&hist, &username]() -> QString {
                 QString target;
                 bool flag = true;
@@ -122,7 +144,7 @@ namespace ma
 
                 return target;
             }();
-
+            /* qDebug() << histories.size(); */
             m_ChatTabs.at(targetChatName.toStdString())->loadChatHistory(
                 hist
             );
@@ -134,7 +156,6 @@ namespace ma
         const QString& group_name,
         const QString& userID)
     {
-        qDebug() << "adding mmember to db cw";
         emit addMemberToDB(group_name, userID);
     }
 

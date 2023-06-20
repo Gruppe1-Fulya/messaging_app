@@ -69,7 +69,7 @@ namespace ma
 
         m_RegisteredChats.push_back(group_info.groupName);
 
-        addGroupToDB(group_info);
+        emit addGroupToDB(group_info);
         emit openGroupChat(group_info);
 
     }
@@ -85,6 +85,42 @@ namespace ma
             emit openGroupChat(g);
         }
 
+    }
+
+    void GroupChatList::onNewGroupMessageArrived(const GroupMessage& msg)
+    {
+        const auto isChatRegistered = qFind(
+            m_RegisteredChats.begin(),
+            m_RegisteredChats.end(),
+            msg.groupName
+        );
+
+        if(isChatRegistered == m_RegisteredChats.end())
+        {
+            m_GroupChatsList->addItem(new QListWidgetItem(msg.groupName));
+            m_RegisteredChats.push_back(msg.groupName);
+            
+            GroupInfo gi;
+            gi.groupName = msg.groupName;
+            gi.members = msg.members;
+            const int updateMember = [&gi, this]() -> int{
+                for(std::size_t i = 0; i < gi.members.size(); i++)
+                {
+                    if(gi.members.at(i) == this->m_Username)
+                    {
+                        return i;
+                    }
+                }
+            }();
+
+            gi.members.replace(updateMember, msg.sender);
+
+            emit addGroupToDB(gi);
+            emit openGroupChat(gi);
+
+            emit newGroupMessage(msg);
+
+        }
     }
 
     GroupChatWidget::GroupChatWidget(
@@ -131,6 +167,13 @@ namespace ma
     {
         m_MainLayout = new QVBoxLayout(this);
 
+        m_ContactLayout = new QHBoxLayout();
+        m_ContactNameBox = new QTextEdit();
+        m_ContactNameBox->setFixedHeight(30);
+        m_AddContactBtn = new QPushButton("Add Member");
+        m_ContactLayout->addWidget(m_ContactNameBox, 50);
+        m_ContactLayout->addWidget(m_AddContactBtn, 50);
+
         m_MessageLayout = new QGridLayout();
 
         m_MsgsFrame = new QFrame();
@@ -153,9 +196,24 @@ namespace ma
         m_SendMsgBox->setLayout(m_SendMsgBoxLayout);
 
         m_MsgsScrollArea->setWidget(m_MsgsFrame);
+        m_MainLayout->addLayout(m_ContactLayout, 5);
         m_MainLayout->addWidget(m_MsgsScrollArea, 90);
-        m_MainLayout->addWidget(m_SendMsgBox, 10);
+        m_MainLayout->addWidget(m_SendMsgBox, 5);
+
+        connect(
+            m_AddContactBtn,
+            &QPushButton::clicked,
+            this,
+            &GroupChatWidget::onAddMemberBtnClicked
+        );
         
+        connect(
+            m_SendMsgBtn,
+            &QPushButton::clicked,
+            this,
+            &GroupChatWidget::sendMessage
+        );
+
         this->setLayout(m_MainLayout);
     }
 
@@ -173,6 +231,93 @@ namespace ma
             /* qDebug() << "Adding user" << userID; */
             emit addNewUserToGroupDB(m_GroupName, userID);
         }
+    }
+
+    void GroupChatWidget::onAddMemberBtnClicked()
+    {
+        addUserToChat(
+            m_GroupName,
+            m_ContactNameBox->toPlainText()
+        );
+
+        m_ContactNameBox->clear();
+    }
+    
+    void GroupChatWidget::sendMessage()
+    {
+        GroupMessage gm;
+        const QString msgToSend = m_TypeMsgBox->toPlainText();
+
+        QLabel* newMsgBox = new QLabel();
+        newMsgBox->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
+        newMsgBox->setText(msgToSend);
+        newMsgBox->setWordWrap(true);
+        newMsgBox->setFrameStyle(QFrame::Box);
+
+        QLabel* userBox = new QLabel();
+        userBox->setText(m_Username);
+        userBox->setAlignment(Qt::AlignTop);
+        userBox->setFixedSize(255, 20);
+        
+        QVBoxLayout* msgLayout = new QVBoxLayout();
+        msgLayout->setStretch(0, 0);
+        msgLayout->setSpacing(0);
+        msgLayout->setContentsMargins(0, 0, 0, 0);
+        msgLayout->addWidget(userBox, 0);
+        msgLayout->addWidget(newMsgBox, 0);
+            
+
+        m_MessageLayout->addLayout(msgLayout, currRow, 1);
+        m_MessageLayout->setSpacing(0);
+        m_TypeMsgBox->clear();
+
+        currRow += 1;
+
+        gm.groupName = m_GroupName;
+        const QVector<QString> memberList = [this]() -> QVector<QString>{
+            QVector<QString> members;
+            for(const auto& member : this->m_GroupMembers)
+            {
+                if(member != this->m_Username)
+                {
+                    members.push_back(member);
+                }
+            }
+
+            return members;
+        }();
+
+        gm.members = memberList;
+        gm.sender = m_Username;
+        gm.data = msgToSend;
+
+        emit transferMessage(gm);
+    }
+
+    void GroupChatWidget::insertNewMessage(const GroupMessage& msg)
+    {
+        QLabel* newMsgBox = new QLabel();
+        newMsgBox->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
+        newMsgBox->setWordWrap(true);
+        newMsgBox->setText(msg.data);
+        newMsgBox->setFrameStyle(QFrame::Box);
+
+        QLabel* userBox = new QLabel();
+        userBox->setText(msg.sender);
+        userBox->setAlignment(Qt::AlignTop);
+        userBox->setFixedSize(255, 20);
+        
+        QVBoxLayout* msgLayout = new QVBoxLayout();
+        msgLayout->setStretch(0, 0);
+        msgLayout->setSpacing(0);
+        msgLayout->setContentsMargins(0, 0, 0, 0);
+        msgLayout->addWidget(userBox, 0);
+        msgLayout->addWidget(newMsgBox, 0);
+
+        m_MessageLayout->addLayout(msgLayout, currRow, 0);
+        m_MessageLayout->setSpacing(0);
+
+        currRow += 1;
     }
 
 }

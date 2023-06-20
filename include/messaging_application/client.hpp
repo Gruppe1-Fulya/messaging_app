@@ -46,9 +46,13 @@ class Client : public QObject
 
     void newMessageArrived(const MessageInfo& message_info);
 
+    void newGroupMessageArrived(const GroupMessage& group_message);
+
     public slots:
 
     void onSendMessage(const MessageInfo& message_info);
+
+    void onSendGroupMessage(const GroupMessage& msg);
     
     void newConnection();
 
