@@ -50,7 +50,7 @@ pub fn insert_new_user_to_db(id : &String, address : &String) -> std::result::Re
     Ok(())
 }
 
-pub fn get_port_number_from_id(email : String) -> std::result::Result<String, Box<dyn std::error::Error>>
+pub fn get_port_number_from_id(email : &String) -> std::result::Result<String, Box<dyn std::error::Error>>
 {
 
     let url  = "mysql://admin:123456@localhost:3306/mainserver_db";

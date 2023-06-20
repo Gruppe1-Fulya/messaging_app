@@ -16,7 +16,8 @@ struct MessageInfo
     data: String,
     sender: String,
     receiver: String,
-    addr : String
+    addr : String,
+    group: String
 }
 
 
@@ -60,7 +61,7 @@ pub async fn init_main_server()
 
             }
 
-            let mut msg : MessageInfo = MessageInfo { data: String::new(), sender: String::new(), receiver: String::new(), addr: String::new()};
+            let mut msg : MessageInfo = MessageInfo { data: String::new(), sender: String::new(), receiver: String::new(), addr: String::new(), group: String::new()};
             let mut address : String = String::new();
 
             match msg_optional {
@@ -74,12 +75,42 @@ pub async fn init_main_server()
                 let receiverStr = msg.receiver.clone();
                 let addressStr : String = msg.addr.clone();
                 let senderStr : String = msg.sender.clone();
+                
+                println!("{}", senderStr);
+                println!("{}", addressStr);
+                let members : Vec<String> = receiverStr.clone().split(";").map(str::to_string).collect();
+                /* println!("{}", receiverStr);
+                for member in &members {
+                    println!("{}", member);
+                } */
+                for member in &members {
+                    let insert_res = insert_new_user_to_db(&senderStr, &address);
+
+                    let address_to_send = get_port_number_from_id(member).unwrap();
+                    if address.is_empty()
+                    {
+                        continue;
+                    }
+                    
+                    let forward_socket = std::net::TcpStream::connect(address_to_send);
+                    if let Ok(mut forward_socket) = forward_socket
+                    {
+                        let forward_msg = serde_json::to_string(&msg).expect("Can't transform message into JSON");
+
+                        if let Err(_) = forward_socket.write_all(forward_msg.as_bytes())
+                        {
+                            println!("Failed to send message.");
+                        }    
+                    }
+
+
+                }
 
                 /* println!("{:?}", senderStr); */   
                 
-                let insert_res = insert_new_user_to_db(&senderStr, &addressStr);
+                /* let insert_res = insert_new_user_to_db(&senderStr, &addressStr);
 
-                address = get_port_number_from_id(receiverStr).unwrap();
+                address = get_port_number_from_id(&receiverStr).unwrap();
                 if address.is_empty()
                 {
                     println!("Address is empty");
@@ -102,7 +133,7 @@ pub async fn init_main_server()
                     {
                         println!("Failed to send message to specified address");
                     }
-                }
+                } */
             
             }
 
