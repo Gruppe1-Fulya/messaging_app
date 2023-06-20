@@ -81,7 +81,7 @@ namespace ma
             m_GroupChatsList->addItem(
                 new QListWidgetItem(g.groupName)
             );
-
+            m_RegisteredChats.push_back(g.groupName);
             emit openGroupChat(g);
         }
 
@@ -89,7 +89,7 @@ namespace ma
 
     void GroupChatList::onNewGroupMessageArrived(const GroupMessage& msg)
     {
-        const auto isChatRegistered = qFind(
+        const auto isChatRegistered = std::find(
             m_RegisteredChats.begin(),
             m_RegisteredChats.end(),
             msg.groupName
@@ -111,15 +111,41 @@ namespace ma
                         return i;
                     }
                 }
-            }();
 
-            gi.members.replace(updateMember, msg.sender);
+                return -1;
+            }();
+            if(updateMember != -1)
+                gi.members.replace(updateMember, msg.sender);
 
             emit addGroupToDB(gi);
             emit openGroupChat(gi);
 
             emit newGroupMessage(msg);
+            /* qDebug() << msg.data; */
 
+        }
+        else
+        {
+            GroupInfo gi;
+            gi.groupName = msg.groupName;
+            gi.members = msg.members;
+            const int updateMember = [&gi, this]() -> int{
+                for(std::size_t i = 0; i < gi.members.size(); i++)
+                {
+                    if(gi.members.at(i) == this->m_Username)
+                    {
+                        return i;
+                    }
+                }
+
+                return -1;
+            }();
+
+            if(updateMember != -1)
+                gi.members.replace(updateMember, msg.sender);
+
+            emit newGroupMessage(msg);
+            /* qDebug() << msg.data; */
         }
     }
 
@@ -278,6 +304,7 @@ namespace ma
             QVector<QString> members;
             for(const auto& member : this->m_GroupMembers)
             {
+                    
                 if(member != this->m_Username)
                 {
                     members.push_back(member);

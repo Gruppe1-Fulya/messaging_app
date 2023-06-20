@@ -132,7 +132,8 @@ void DatabaseHelper::onAddMemberToDB(const QString& group_name, const QString& u
     qDebug() << "Adding " << userID << " to " << group_name + "_info";
     QSqlQuery q;
 
-    q.prepare("SELECT email FROM" + group_name + "_info WHERE email=:id");
+    q.prepare("SELECT * FROM" + group_name + "_info WHERE email=:id");
+    qDebug() << "user id: " << userID;
     q.bindValue(":id", userID);
     q.exec();
     if(q.size() > 0)

@@ -68,7 +68,8 @@ pub async fn init_main_server()
                 Some(ref t) => {msg = msg_optional.unwrap()},
                 None => {println!("empty")},
             }
-            
+            address = msg.addr.clone();
+            println!("{}", &address);
             if !msg.addr.is_empty()
             {   
                 //msg = msg_optional.unwrap();
@@ -77,14 +78,17 @@ pub async fn init_main_server()
                 let senderStr : String = msg.sender.clone();
                 
                 println!("{}", senderStr);
-                println!("{}", addressStr);
+                println!("{}", &addressStr);
                 let members : Vec<String> = receiverStr.clone().split(";").map(str::to_string).collect();
                 /* println!("{}", receiverStr);
                 for member in &members {
                     println!("{}", member);
                 } */
-                for member in &members {
-                    let insert_res = insert_new_user_to_db(&senderStr, &address);
+                let insert_res = insert_new_user_to_db(&senderStr, &address);
+                for member in &members  {
+                    println!("{}", member);
+                }
+                for member in &members {   
 
                     let address_to_send = get_port_number_from_id(member).unwrap();
                     if address.is_empty()

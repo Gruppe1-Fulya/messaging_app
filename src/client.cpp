@@ -221,16 +221,14 @@ void Client::onSendGroupMessage(const GroupMessage& msg)
 
     const QString addr = m_HostName + ":" + m_PortNum;
     QString receiversString;
-
+    qDebug() << msg.members.size();
     for(const auto& receiver : msg.members)
     {
         receiversString += receiver;
         receiversString += ";";
     }
-
-    /* QString senderStr = msg.groupName + ";" + msg.sender; */
-
     qDebug() << receiversString;
+    /* QString senderStr = msg.groupName + ";" + msg.sender; */
 
     const auto msgObj = QJsonObject{
         {"data", msg.data},
